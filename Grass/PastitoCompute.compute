@@ -1,0 +1,115 @@
+#pragma kernel crearPastito
+
+struct Triangulo{
+  float3 a;
+  float3 b;
+  float3 c;
+};
+
+struct Pasto{
+  float3 a;
+  float3 b;
+  float3 c;
+  float3 d;
+};
+
+float radioTallo;
+float alturaMinima;
+float alturaMaxima;
+float anguloMaximo;
+int pastoPorMetro;
+
+uint randState;
+
+RWStructuredBuffer<float3> _vertices;
+RWStructuredBuffer<int> _triangulos;
+
+AppendStructuredBuffer<Pasto> _outPasto;
+
+float randomRange(float min, float max){
+    randState = 1664525 * randState + 1013904223;
+
+    float randActual = (randState % 10) / (float) 10;
+
+    return randActual * (max - min) + min;
+}
+
+float3 getNormalATriangulo(Triangulo tri) {
+  float3 ab = tri.a - tri.b;
+  float3 ac = tri.a - tri.c;
+  ab = cross(ab,ac);
+  ab = ab / length(ab);
+  return ab;
+}
+
+float3 getUpEnTriangulo(Triangulo tri){
+  float3 res = ((tri.a + tri.b + tri.c) / 3);
+  res = res / length(res);
+  return res;
+}
+
+float getAreaTriangulo(Triangulo tri) {
+  float3 a = tri.a;
+  float3 b = tri.b;
+  float3 c = tri.c;
+  
+  return abs(a.x * (b.y - c.y) + b.x * (c.y - a.y) + c.x * (a.y - b.y));
+}
+
+float3 getRandomPointOnTriangle(Triangulo tri){
+  float u1 = randomRange(0, 1);
+  float u2 = randomRange(0, 1);
+
+  if (u1 + u2 > 1) {
+    u1 = 1 - u1;
+    u2 = 1 - u2;
+  }
+
+  return ((tri.b - tri.a) * u1 + (tri.c - tri.a) * u2) + tri.a;
+}
+
+void generateAPastoOnPoint(float3 pos, float3 direccion) {
+  float3 z = float3(direccion.z, direccion.x, direccion.y);
+  float3 x = cross(z, direccion);
+
+  Pasto nuevoPasto;
+  nuevoPasto.a =  z * radioTallo + pos;
+  nuevoPasto.b = -x * radioTallo + pos;
+  nuevoPasto.c =  x * radioTallo + pos;
+
+  nuevoPasto.d = (randomRange(alturaMinima, alturaMaxima) * direccion) + pos;
+
+  _outPasto.Append(nuevoPasto);
+}
+
+Triangulo getTriangulo(uint3 id){
+  int i = id.x * 3;
+
+  float3 a = _vertices[_triangulos[i]];
+  float3 b = _vertices[_triangulos[i+1]];
+  float3 c = _vertices[_triangulos[i+2]];
+
+  Triangulo tri;
+  tri.a = a;
+  tri.b = b;
+  tri.c = c;
+
+  return tri;
+}
+
+[numthreads(128,1,1)]
+void crearPastito(uint3 id: SV_DispatchThreadID) {
+  Triangulo tri = getTriangulo(id);
+
+  float3 normalTriangulo = getNormalATriangulo(tri);
+  float3 UpEnEsfera = getUpEnTriangulo(tri);
+
+  float anguloDelTriangulo = acos(dot(UpEnEsfera, normalTriangulo));
+
+  if (anguloDelTriangulo <= anguloMaximo) {
+    int pastoEnTriangulo = pastoPorMetro * getAreaTriangulo(tri);
+    for (int i = 0; i <= pastoEnTriangulo; i++) {
+      generateAPastoOnPoint(getRandomPointOnTriangle(tri), normalTriangulo);
+    }
+  }
+}
