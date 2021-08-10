@@ -49,7 +49,7 @@ public class MeshBuilder
 
     return indice;
   }
-  public Mesh crearMesh()
+  public Mesh CrearMesh()
   {
     mesh.Clear();
     if (m_Vertices.Count >= 65000)

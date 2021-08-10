@@ -34,7 +34,7 @@ public class GrassGenerator : MonoBehaviour
 
     gpu_generateGrassOnObject(grassObject);
 
-    GetComponent<MeshFilter>().sharedMesh = mesh.crearMesh();
+    GetComponent<MeshFilter>().sharedMesh = mesh.CrearMesh();
   }
   private void gpu_generateGrassOnObject(GameObject superficie)
   {

@@ -16,7 +16,7 @@ public class IcosphereCreator : GeneradorDeEsferas
     for (int r = 0; r < config.detalle; r++)
       refinarEsfera();
 
-    return meshBuilder.crearMesh();
+    return meshBuilder.CrearMesh();
   }
 
 
