@@ -51,9 +51,18 @@ namespace Generador
                 transform.position.z + chunkSize * z
             );
             ChunkCampoAsteroides chunk = generado.AddComponent<ChunkCampoAsteroides>();
+            BoxCollider trigger = generado.AddComponent<BoxCollider>();
+            generado.tag = "Chunk";
+
+            // Esto hay que cambiarlo
+            // El chunk se tiene que hacer cargo de qué va a generar
             chunk.objetoAGenerar = CuboEjemplo;
+            chunk.size = chunkSize;
             chunks.Add(chunk);
             chunk.Generar();
+
+            trigger.isTrigger = true;
+            trigger.size = new Vector3(chunkSize, chunkSize, chunkSize);
 
             return generado;
         }
