@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Generador
@@ -24,11 +22,6 @@ namespace Generador
         {
             if (GameObject.ReferenceEquals(col.gameObject, ChunkHandler.Pivot))
                 ChunkHandler.UpdatePivotPosition(this);
-        }
-        private void OnTriggerExit(Collider col)
-        {
-            if (GameObject.ReferenceEquals(col.gameObject, ChunkHandler.Pivot))
-                ChunkHandler.RestorePivotPosition(this);
         }
     }
 }
