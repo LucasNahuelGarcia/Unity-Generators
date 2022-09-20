@@ -3,38 +3,36 @@ using System.Collections.Generic;
 
 namespace Generador
 {
-    public class AsteroidesChunkHandler : MonoBehaviour
+    public class ChunkHandler : MonoBehaviour
     {
-        public static AsteroidesChunkHandler Instance
-        {
-            get { return _instance; }
-        }
-        private static AsteroidesChunkHandler _instance;
-        private List<ChunkCampoAsteroides> chunks;
+        private static ChunkHandler _instance;
+        private Chunk[,,] chunks;
+        private Vector3Int centroArr;
+        public GameObject Pivot;
         public GameObject CuboEjemplo;
         public Generator generador;
         public int chunkRadius = 1;
         public float chunkSize = 5;
         private Vector3 velocidadChunks;
+        private Vector3Int pivotPosition;
+        private Vector3Int prevPivotPosition;
+
 
         void Start()
         {
+            int chunkDiameter = chunkRadius * 2 + 1;
+            centroArr = new Vector3Int(chunkRadius, chunkRadius, chunkRadius);
+            chunks = new Chunk[chunkDiameter, chunkDiameter, chunkDiameter];
             this.Generar();
-            if (_instance == null)
-                _instance = this;
-            else
-                Debug.LogError("Existen dos o mas instancias de AsteroideChunkHandler");
         }
 
         void Update()
         {
-            this.MoverChunks(velocidadChunks * Time.deltaTime);
         }
 
         [ContextMenu("Generar")]
         private void Generar()
         {
-            chunks = new List<ChunkCampoAsteroides>();
             for (int x = -chunkRadius; x <= chunkRadius; x++)
                 for (int z = -chunkRadius; z <= chunkRadius; z++)
                     for (int y = -chunkRadius; y <= chunkRadius; y++)
@@ -50,7 +48,7 @@ namespace Generador
                 transform.position.y + chunkSize * y,
                 transform.position.z + chunkSize * z
             );
-            ChunkCampoAsteroides chunk = generado.AddComponent<ChunkCampoAsteroides>();
+            Chunk chunk = generado.AddComponent<Chunk>();
             BoxCollider trigger = generado.AddComponent<BoxCollider>();
             generado.tag = "Chunk";
 
@@ -58,7 +56,10 @@ namespace Generador
             // El chunk se tiene que hacer cargo de qué va a generar
             chunk.objetoAGenerar = CuboEjemplo;
             chunk.size = chunkSize;
-            chunks.Add(chunk);
+            Vector3Int chunkIndex = new Vector3Int(x + chunkRadius, y + chunkRadius, z + chunkRadius);
+            chunk.ChunkIndex = chunkIndex;
+            chunk.ChunkHandler = this;
+            chunks[chunkIndex.x, chunkIndex.y, chunkIndex.z] = chunk;
             chunk.Generar();
 
             trigger.isTrigger = true;
@@ -67,17 +68,41 @@ namespace Generador
             return generado;
         }
 
-        public void MoverChunks(Vector3 direccion)
+        public void UpdatePivotPosition(Chunk chunk)
         {
-            foreach (ChunkCampoAsteroides chunk in chunks)
-            {
-                chunk.transform.Translate(direccion);
-            }
+            if (prevPivotPosition == null)
+                prevPivotPosition = pivotPosition;
+            pivotPosition = chunk.ChunkIndex;
+            UpdateChunks();
         }
 
-        public void SetVelocidadChunks(Vector3 velocidad)
+        // En algunos casos el pivot puede entrar y salir de un chunk sin
+        // dejar el anterior, confunde al sistema de chunks.
+        // Para corregirlo también aviso si el pivot deja un chunk.
+        public void RestorePivotPosition(Chunk chunk)
         {
-            this.velocidadChunks = velocidad;
+            Vector3Int restoringChunkPosition = chunk.ChunkIndex;
+            if (restoringChunkPosition == prevPivotPosition)
+                pivotPosition = prevPivotPosition;
+            UpdateChunks();
+        }
+
+        private void UpdateChunks()
+        {
+            Debug.Log("Pivot en Chunk: " + pivotPosition);
+            int centro = chunkRadius;
+            if (pivotPosition.x != centro)
+            {
+
+            }
+            if (pivotPosition.y != centro)
+            {
+
+            }
+            if (pivotPosition.z != centro)
+            {
+
+            }
         }
 
         [ContextMenu("Limpiar")]
