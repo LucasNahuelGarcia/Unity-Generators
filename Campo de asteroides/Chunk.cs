@@ -12,9 +12,12 @@ namespace Generador
         [ContextMenu("Generar")]
         public void Generar()
         {
+            Vector3 generadoPosition = Random.insideUnitSphere;
+            Vector3 generadoRotation = Random.insideUnitSphere;
+
             BoxCollider col = this.gameObject.AddComponent<BoxCollider>();
             col.isTrigger = true;
-            GameObject generado = Instantiate(objetoAGenerar, transform.position, transform.rotation);
+            GameObject generado = Instantiate(objetoAGenerar, transform.position + generadoPosition * size, Quaternion.Euler(generadoRotation));
             generado.transform.parent = this.transform;
         }
 
