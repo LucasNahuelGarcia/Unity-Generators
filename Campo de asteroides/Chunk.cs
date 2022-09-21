@@ -18,6 +18,8 @@ namespace Generador
             BoxCollider col = this.gameObject.AddComponent<BoxCollider>();
             col.isTrigger = true;
             GameObject generado = Instantiate(objetoAGenerar, transform.position + generadoPosition * size, Quaternion.Euler(generadoRotation));
+            RockGeneratorVoronoi voronoi = generado.GetComponent<RockGeneratorVoronoi>();
+            voronoi.Generar();
             generado.transform.parent = this.transform;
         }
 

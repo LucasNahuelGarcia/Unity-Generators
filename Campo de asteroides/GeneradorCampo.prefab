@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7050749308934028586}
-  - component: {fileID: 1111441556988610479}
+  - component: {fileID: 1086842601}
   m_Layer: 0
   m_Name: GeneradorCampo
   m_TagString: Untagged
@@ -32,7 +32,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1111441556988610479
+--- !u!114 &1086842601
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -41,9 +41,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 7050749308934028584}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa32d0728127cde7891cca23d557bc80, type: 3}
+  m_Script: {fileID: 11500000, guid: 57ebf4aec9b41e2db8205e017494d053, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CuboEjemplo: {fileID: 3609533381237522825, guid: 0fbf7643372de839f84d6798981163f6, type: 3}
-  chunkRadius: 3
-  chunkSize: 10
+  Pivot: {fileID: 0}
+  CuboEjemplo: {fileID: 3609533381237522825, guid: 2f35bb163d0ccbbceb649d3e2595e0cf, type: 3}
+  chunkRadius: 14
+  chunkSize: 15
