@@ -8,9 +8,10 @@ namespace Generador
         private static ChunkHandler _instance;
         private List<Chunk> chunks;
         private Vector3Int centroArr;
+        // El pivot es el objeto alrededor del que se mueven
+        // los chunks
         public GameObject Pivot;
         public GameObject CuboEjemplo;
-        public Generator generador;
         public int chunkRadius = 1;
         public float chunkSize = 5;
         private Vector3 velocidadChunks;
@@ -23,10 +24,6 @@ namespace Generador
             centroArr = new Vector3Int(chunkRadius, chunkRadius, chunkRadius);
             chunks = new List<Chunk>();
             this.Generar();
-        }
-
-        void Update()
-        {
         }
 
         [ContextMenu("Generar")]
@@ -80,89 +77,85 @@ namespace Generador
             //TODO: REFACTOR
             Debug.Log("Pivot en Chunk: " + pivotPosition);
             int centro = chunkRadius;
+            int indiceAlFrente = (chunkRadius * 2 + 1);
+
             if (pivotPosition.x > centro)
             {
                 foreach (Chunk chunk in chunks)
+                {
                     if (chunk.ChunkIndex.x == 0)
                     {
-                        chunk.transform.Translate((chunkRadius * 2 + 1) * chunkSize, 0, 0);
-                        chunk.ChunkIndex.x = chunkRadius * 2 + 1;
+                        chunk.transform.Translate(indiceAlFrente * chunkSize, 0, 0);
+                        chunk.ChunkIndex.x = chunkRadius * 2;
                     }
-                foreach (Chunk chunk in chunks)
-                    if (chunk.ChunkIndex.x != 0)
-                    {
+                    else
                         chunk.ChunkIndex.x = chunk.ChunkIndex.x - 1;
-                    }
+                }
             }
             else if (pivotPosition.x < centro)
             {
                 foreach (Chunk chunk in chunks)
+                {
                     if (chunk.ChunkIndex.x == chunkRadius * 2)
                     {
-                        chunk.transform.Translate(-(chunkRadius * 2 + 1) * chunkSize, 0, 0);
-                        chunk.ChunkIndex.x = -1;
+                        chunk.transform.Translate(-indiceAlFrente * chunkSize, 0, 0);
+                        chunk.ChunkIndex.x = 0;
                     }
-                foreach (Chunk chunk in chunks)
-                    if (chunk.ChunkIndex.x != chunkRadius * 2)
-                    {
+                    else
                         chunk.ChunkIndex.x = chunk.ChunkIndex.x + 1;
-                    }
+                }
             }
             if (pivotPosition.y > centro)
             {
                 foreach (Chunk chunk in chunks)
+                {
                     if (chunk.ChunkIndex.y == 0)
                     {
-                        chunk.transform.Translate(0, (chunkRadius * 2 + 1) * chunkSize, 0);
-                        chunk.ChunkIndex.y = chunkRadius * 2 + 1;
+                        chunk.transform.Translate(0, indiceAlFrente * chunkSize, 0);
+                        chunk.ChunkIndex.y = chunkRadius * 2;
                     }
-                foreach (Chunk chunk in chunks)
-                    if (chunk.ChunkIndex.y != 0)
-                    {
+                    else
                         chunk.ChunkIndex.y = chunk.ChunkIndex.y - 1;
-                    }
+                }
             }
             else if (pivotPosition.y < centro)
             {
                 foreach (Chunk chunk in chunks)
+                {
                     if (chunk.ChunkIndex.y == chunkRadius * 2)
                     {
-                        chunk.transform.Translate(0, -(chunkRadius * 2 + 1) * chunkSize, 0);
-                        chunk.ChunkIndex.y = -1;
+                        chunk.transform.Translate(0, -indiceAlFrente * chunkSize, 0);
+                        chunk.ChunkIndex.y = 0;
                     }
-                foreach (Chunk chunk in chunks)
-                    if (chunk.ChunkIndex.y != chunkRadius * 2)
-                    {
+                    else
                         chunk.ChunkIndex.y = chunk.ChunkIndex.y + 1;
-                    }
+                }
             }
             if (pivotPosition.z > centro)
             {
                 foreach (Chunk chunk in chunks)
+                {
                     if (chunk.ChunkIndex.z == 0)
                     {
-                        chunk.transform.Translate(0, 0, (chunkRadius * 2 + 1) * chunkSize);
-                        chunk.ChunkIndex.z = chunkRadius * 2 + 1;
+                        chunk.transform.Translate(0, 0, indiceAlFrente * chunkSize);
+                        chunk.ChunkIndex.z = chunkRadius * 2;
                     }
-                foreach (Chunk chunk in chunks)
-                    if (chunk.ChunkIndex.z != 0)
-                    {
+                    else
                         chunk.ChunkIndex.z = chunk.ChunkIndex.z - 1;
-                    }
+                }
             }
             else if (pivotPosition.z < centro)
             {
                 foreach (Chunk chunk in chunks)
+                {
                     if (chunk.ChunkIndex.z == chunkRadius * 2)
                     {
-                        chunk.transform.Translate(0, 0, -(chunkRadius * 2 + 1) * chunkSize);
-                        chunk.ChunkIndex.z = -1;
+                        chunk.transform.Translate(0, 0, -indiceAlFrente * chunkSize);
+                        chunk.ChunkIndex.z = 0;
                     }
-                foreach (Chunk chunk in chunks)
-                    if (chunk.ChunkIndex.z != chunkRadius * 2)
-                    {
+                    else
                         chunk.ChunkIndex.z = chunk.ChunkIndex.z + 1;
-                    }
+                }
             }
         }
 
