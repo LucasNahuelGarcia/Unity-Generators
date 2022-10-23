@@ -2,91 +2,91 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PerlinNoise : noiseMap
+namespace Generador.LandGenerator
 {
-  private static int _RANGO_RANDOM = 100000;
-  private float maxNoiseHeight, minNoiseHeight;
-  private int ancho, alto, octavas;
-  private float escala, persistencia, lacunaridad;
-  private int seed;
-  private Vector2 offset;
-  public void configNoiseMap(NoiseMapConfig config)
-  {
-    ancho = config.ancho;
-    alto = config.alto;
-    octavas = config.octavas;
-    escala = config.size <= 0 ? 0.000001f : config.size;
-    persistencia = config.persistencia;
-    lacunaridad = config.lacunaridad;
-    seed = config.seed;
-    offset = config.offset;
-  }
-  public float[,] GenerateNoiseMap()
-  {
-    minNoiseHeight = float.MaxValue;
-    maxNoiseHeight = float.MinValue;
-    float[,] perlinNoiseMap = calcularMapa();
-    normalizarMapa(perlinNoiseMap, maxNoiseHeight, minNoiseHeight);
-
-    return perlinNoiseMap;
-  }
-
-  private float[,] calcularMapa()
-  {
-    float[,] perlinNoiseMap = new float[ancho, alto];
-
-
-    for (int x = 0; x < ancho; x++)
-      for (int y = 0; y < alto; y++)
-        perlinNoiseMap[x, y] = calcularSumaDeOctavasEnPunto(x, y);
-
-    return perlinNoiseMap;
-  }
-
-  private float calcularSumaDeOctavasEnPunto(int x, int y)
-  {
-    float amplitud = 1;
-    float frecuencia = 1;
-    float noiseHeight = 0;
-    float centroX = (x - ancho / 2f) / escala + offset.x;
-    float centroY = (y - alto / 2f) / escala + offset.y;
-
-    System.Random pseudoRandom = new System.Random(seed);
-
-    for (int i = 0; i < octavas; i++)
+    public class PerlinNoise : noiseMap
     {
-      //float xTent = centroX * frecuencia + pseudoRandom.Next(-_RANGO_RANDOM, _RANGO_RANDOM) + offset.x;
-      //float yTent = centroY * frecuencia + pseudoRandom.Next(-_RANGO_RANDOM, _RANGO_RANDOM) + offset.y;
+        private static int _RANGO_RANDOM = 100000;
+        private float maxNoiseHeight, minNoiseHeight;
+        private int ancho, alto;
+        private int seed;
+        private Vector2 offset;
+        public void configNoiseMap(NoiseMapConfig config)
+        {
+            ancho = config.ancho;
+            alto = config.alto;
+            seed = config.seed;
+            offset = config.offset;
+        }
 
-      float perlinVal = Mathf.PerlinNoise(centroX, centroY) * 2 - 1;
+        public float[,] GenerateNoiseMap(List<PerlinOctave> octaves)
+        {
+            minNoiseHeight = float.MaxValue;
+            maxNoiseHeight = float.MinValue;
 
-      noiseHeight += perlinVal * amplitud;
+            float[,] perlinNoiseMap = calcularMapa(octaves);
+            normailizeMap(perlinNoiseMap, maxNoiseHeight, minNoiseHeight);
 
-      //Cada octava tiene menos amplitud
-      //(Menos influencia en el resultado)
-      amplitud = amplitud * persistencia;
+            return perlinNoiseMap;
+        }
+        public List<float[,]> GenerateNoiseMaps(NoiseMapConfig[] config)
+        {
+            return new List<float[,]>();
+        }
 
-      //Cada octava tiene mas frecuencia
-      frecuencia = frecuencia * lacunaridad;
+        private float[,] calcularMapa(List<PerlinOctave> octaves)
+        {
+            float[,] perlinNoiseMap = new float[ancho, alto];
+
+            for (int x = 0; x < ancho; x++)
+                for (int y = 0; y < alto; y++)
+                    perlinNoiseMap[x, y] = calculatePointHeight(x, y, octaves);
+
+            return perlinNoiseMap;
+        }
+
+        private float calculatePointHeight(int x, int y, List<PerlinOctave> octaves)
+        {
+            float noiseHeight = 0;
+            float centroX = (x - ancho / 2f);
+            float centroY = (y - alto / 2f);
+
+            System.Random pseudoRandom = new System.Random(seed);
+
+            foreach (PerlinOctave octave in octaves)
+            {
+                float octaveX = centroX / octave.heightMapZoom + offset.x + octave.offset.x;
+                float octaveY = centroY / octave.heightMapZoom + offset.y + octave.offset.y;
+                float octaveHeightAtPoint = (Mathf.PerlinNoise(octaveX, octaveY) * 2 - 1);
+
+                octaveHeightAtPoint *= octave.curveHeightMultiplier.Evaluate(octaveHeightAtPoint);
+                octaveHeightAtPoint *= octave.weight;
+
+                noiseHeight += octaveHeightAtPoint;
+                Debug.Log(octave.weight);
+            }
+
+            actualizarMaximoYMinimo(noiseHeight);
+
+            return noiseHeight;
+        }
+
+
+
+
+        private void actualizarMaximoYMinimo(float noiseHeight)
+        {
+            if (noiseHeight > maxNoiseHeight)
+                maxNoiseHeight = noiseHeight;
+            else if (noiseHeight < minNoiseHeight)
+                minNoiseHeight = noiseHeight;
+        }
+
+        private static void normailizeMap(float[,] map, float min, float max)
+        {
+            for (int x = 0; x < map.GetLength(0); x++)
+                for (int y = 0; y < map.GetLength(1); y++)
+                    map[x, y] = Mathf.InverseLerp(max, min, map[x, y]);
+        }
     }
-
-    actualizarMaximoYMinimo(noiseHeight);
-
-    return noiseHeight;
-  }
-
-  private void actualizarMaximoYMinimo(float noiseHeight)
-  {
-    if (noiseHeight > maxNoiseHeight)
-      maxNoiseHeight = noiseHeight;
-    else if (noiseHeight < minNoiseHeight)
-      minNoiseHeight = noiseHeight;
-  }
-
-  private static void normalizarMapa(float[,] map, float min, float max)
-  {
-    for (int x = 0; x < map.GetLength(0); x++)
-      for (int y = 0; y < map.GetLength(1); y++)
-        map[x, y] = Mathf.InverseLerp(max, min, map[x, y]);
-  }
 }

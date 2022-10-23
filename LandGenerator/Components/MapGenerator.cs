@@ -14,20 +14,15 @@ namespace Generador.LandGenerator
         public Material baseMaterial;
         public noiseMap noiseMapGenerator;
         public bool autoUpdate = true;
-        [Range(2, 1000)] //La cantidad de  vertices que hay en el ancho del mapa
+        [Range(2, 70)] //La cantidad de  vertices que hay en el ancho del mapa
         [Tooltip("How many vertex along width. VertexResolution*2=TotalVertex")]
         public int VerticesPerLine = 2;
         public int ChunkSize = 241;
-        public float heightMapZoom = 0.3f;
-        public int octavas = 3;
-        [Range(0.0001f, 1.0f)]
-        public float persistencia = 0.5f;
-        [Range(0f, 8f)]
-        public float lacunaridad = 2;
-        public int seed = 1;
-        public Vector2 offset;
         public float generalHeightMultiplier;
         public AnimationCurve curveHeightMultiplier;
+        public int seed = 1;
+        public PerlinOctave[] Octaves;
+        public Vector2 offset;
         public Bioma[] biomas;
         public bool flatShading = false;
         private Land land;
@@ -41,8 +36,24 @@ namespace Generador.LandGenerator
                 noiseMapGenerator = new PerlinNoise();
 
             noiseMapSetUp();
-            float[,] map = noiseMapGenerator.generarNoiseMap();
+            float[,] map = noiseMapGenerator.GenerateNoiseMap(configOctaves());
             GenerateMapMeshAndTexture(map);
+        }
+
+        private List<PerlinOctave> configOctaves()
+        {
+            List<PerlinOctave> listOctaves = new List<PerlinOctave>();
+            foreach (PerlinOctave octave in Octaves)
+            {
+                PerlinOctave newOctave = new PerlinOctave();
+                newOctave.heightMapZoom = (1 / octave.heightMapZoom) * VerticesPerLine;
+                newOctave.weight = octave.weight;
+                newOctave.curveHeightMultiplier = octave.curveHeightMultiplier;
+                newOctave.offset = octave.offset;
+
+                listOctaves.Add(newOctave);
+            }
+            return listOctaves;
         }
 
         private void createLand()
@@ -106,23 +117,11 @@ namespace Generador.LandGenerator
             NoiseMapConfig noiseMapConfig = new NoiseMapConfig();
             noiseMapConfig.alto = VerticesPerLine;
             noiseMapConfig.ancho = VerticesPerLine;
-            noiseMapConfig.size = (1 / heightMapZoom) * VerticesPerLine;
-            noiseMapConfig.octavas = octavas;
-            noiseMapConfig.persistencia = persistencia;
-            noiseMapConfig.lacunaridad = lacunaridad;
+            //noiseMapConfig.size = (1 / heightMapZoom) * VerticesPerLine;
             noiseMapConfig.seed = seed;
             noiseMapConfig.offset = offset;
 
             noiseMapGenerator.configNoiseMap(noiseMapConfig);
-        }
-
-        void OnValidate()
-        {
-            octavas = octavas <= 0 ? 1 : octavas;
-            heightMapZoom = heightMapZoom <= 0 ? 1 : heightMapZoom;
-            lacunaridad = lacunaridad <= 0 ? 1 : lacunaridad;
-            persistencia = persistencia < 0 ? 0 : persistencia;
-            persistencia = persistencia > 1 ? 1 : persistencia;
         }
 
         private MeshBuilder generateTerrainMesh(float[,] heightMap)
