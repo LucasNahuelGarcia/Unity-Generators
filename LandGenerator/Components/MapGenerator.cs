@@ -65,15 +65,14 @@ public class MapGenerator : MonoBehaviour
 
     private void GenerateMapMeshAndTexture(float[,] map)
     {
-        //Color[] biomaMap = calcularColourMapDeBiomas(map);
+        Color[] biomaMap = calcularColourMapDeBiomas(map);
         Mesh meshTerreno = generateTerrainMesh(map).CreateMesh();
-        //Texture2D texture = TextureGenerator.textureFromColourMap(biomaMap, ChunkSize, ChunkSize);
+        Texture2D texture = TextureGenerator.textureFromColourMap(biomaMap, VerticesPerLine, VerticesPerLine);
 
         land.meshFilter.sharedMesh = meshTerreno;
         land.meshCollider.sharedMesh = meshTerreno;
         land.meshRenderer.sharedMaterial = baseMaterial;
-        //land.meshRenderer.sharedMaterial.mainTexture = texture;
-        //z land.meshRenderer.transform.localScale = new Vector3(texture.width, 1, texture.height);
+        land.meshRenderer.sharedMaterial.mainTexture = texture;
     }
 
     private Color[] calcularColourMapDeBiomas(float[,] map)
@@ -83,14 +82,14 @@ public class MapGenerator : MonoBehaviour
         for (int y = 0; y < VerticesPerLine; y++)
             for (int x = 0; x < VerticesPerLine; x++)
             {
-                Bioma bioma = encontrarBioma(map[x, y]);
+                Bioma bioma = encontrarBiomaDeAltura(map[x, y]);
                 colorMap[y * VerticesPerLine + x] = bioma.color;
             }
 
         return colorMap;
     }
 
-    private Bioma encontrarBioma(float altura)
+    private Bioma encontrarBiomaDeAltura(float altura)
     {
         Bioma minimoBioma = new Bioma();
         minimoBioma.color = Color.red;
@@ -113,7 +112,7 @@ public class MapGenerator : MonoBehaviour
         NoiseMapConfig noiseMapConfig = new NoiseMapConfig();
         noiseMapConfig.alto = VerticesPerLine;
         noiseMapConfig.ancho = VerticesPerLine;
-        noiseMapConfig.size = (1/heightMapZoom) * VerticesPerLine;
+        noiseMapConfig.size = (1 / heightMapZoom) * VerticesPerLine;
         noiseMapConfig.octavas = octavas;
         noiseMapConfig.persistencia = persistencia;
         noiseMapConfig.lacunaridad = lacunaridad;
@@ -157,7 +156,7 @@ public class MapGenerator : MonoBehaviour
     private void addVertices(MeshBuilder meshData, float[,] heightMap)
     {
         Vector3 initialPosition = Vector3.zero;
-        float vertexDistance = ChunkSize / (float) (VerticesPerLine - 1);
+        float vertexDistance = ChunkSize / (float)(VerticesPerLine - 1);
 
         for (int z = 0; z < VerticesPerLine; z++)
             for (int x = 0; x < VerticesPerLine; x++)
@@ -168,6 +167,7 @@ public class MapGenerator : MonoBehaviour
 
                 Vector3 newVertex = new Vector3(vertex_X, vertexHeight, vertex_Z);
 
+                meshData.UVs.Add(new Vector2(x, z) / VerticesPerLine);
                 meshData.AddVertice(newVertex);
             }
         Debug.Log("Vertex distance = " + vertexDistance);
