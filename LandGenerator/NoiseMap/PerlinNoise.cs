@@ -21,7 +21,7 @@ public class PerlinNoise : noiseMap
     seed = config.seed;
     offset = config.offset;
   }
-  public float[,] generarNoiseMap()
+  public float[,] GenerateNoiseMap()
   {
     minNoiseHeight = float.MaxValue;
     maxNoiseHeight = float.MinValue;
