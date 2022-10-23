@@ -55,8 +55,8 @@ namespace Generador.LandGenerator
 
             foreach (PerlinOctave octave in octaves)
             {
-                float octaveX = centroX / octave.heightMapZoom + offset.x + octave.offset.x;
-                float octaveY = centroY / octave.heightMapZoom + offset.y + octave.offset.y;
+                float octaveX = (centroX + offset.x + octave.offset.x) / octave.heightMapZoom;
+                float octaveY = (centroY + offset.y + octave.offset.y) / octave.heightMapZoom;
                 float octaveHeightAtPoint = (Mathf.PerlinNoise(octaveX, octaveY) * 2 - 1);
 
                 octaveHeightAtPoint = octave.curveHeightMultiplier.Evaluate(octaveHeightAtPoint);
