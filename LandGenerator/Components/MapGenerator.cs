@@ -4,11 +4,11 @@ using UnityEngine;
 
 namespace Generador.LandGenerator
 {
-    public class MapGenerator : MonoBehaviour
+    public class MapGenerator : MonoBehaviour, Generator
     {
         void Start()
         {
-            Generate();
+            Generar();
         }
 
         public Material baseMaterial;
@@ -22,12 +22,13 @@ namespace Generador.LandGenerator
         public AnimationCurve curveHeightMultiplier;
         public int seed = 1;
         public PerlinOctave[] Octaves;
+        public bool offsetIsPosition = true;
         public Vector2 offset;
         public Bioma[] biomas;
         public bool flatShading = false;
         private Land land;
 
-        public void Generate()
+        public void Generar()
         {
             if (land.gameObject == null)
                 createLand();
@@ -54,6 +55,11 @@ namespace Generador.LandGenerator
                 listOctaves.Add(newOctave);
             }
             return listOctaves;
+        }
+
+        public void SetCalidadMesh(int calidad)
+        {
+            this.VerticesPerLine = calidad;
         }
 
         private void createLand()
@@ -117,9 +123,8 @@ namespace Generador.LandGenerator
             NoiseMapConfig noiseMapConfig = new NoiseMapConfig();
             noiseMapConfig.alto = VerticesPerLine;
             noiseMapConfig.ancho = VerticesPerLine;
-            //noiseMapConfig.size = (1 / heightMapZoom) * VerticesPerLine;
             noiseMapConfig.seed = seed;
-            noiseMapConfig.offset = offset;
+            noiseMapConfig.offset = offsetIsPosition ? new Vector2(transform.position.x, transform.position.z) : offset;
 
             noiseMapGenerator.configNoiseMap(noiseMapConfig);
         }
@@ -139,7 +144,8 @@ namespace Generador.LandGenerator
 
         private void addVertices(MeshBuilder meshData, float[,] heightMap)
         {
-            Vector3 initialPosition = Vector3.zero;
+            Vector3 initialPosition = transform.position - (new Vector3(ChunkSize / 2, 0, ChunkSize / 2));
+
             float vertexDistance = ChunkSize / (float)(VerticesPerLine - 1);
 
             for (int z = 0; z < VerticesPerLine; z++)
