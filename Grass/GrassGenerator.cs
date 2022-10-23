@@ -34,7 +34,7 @@ public class GrassGenerator : MonoBehaviour
 
     gpu_generateGrassOnObject(grassObject);
 
-    GetComponent<MeshFilter>().sharedMesh = mesh.CrearMesh();
+    GetComponent<MeshFilter>().sharedMesh = mesh.CreateMesh();
   }
   private void gpu_generateGrassOnObject(GameObject superficie)
   {
@@ -82,10 +82,10 @@ public class GrassGenerator : MonoBehaviour
 
   private void agregarPastoAMesh(Pasto pasto)
   {
-    int iA = mesh.addVertice(pasto.a);
-    int iB = mesh.addVertice(pasto.b);
-    int iC = mesh.addVertice(pasto.c);
-    int iD = mesh.addVertice(pasto.d);
+    int iA = mesh.AddVertice(pasto.a);
+    int iB = mesh.AddVertice(pasto.b);
+    int iC = mesh.AddVertice(pasto.c);
+    int iD = mesh.AddVertice(pasto.d);
 
     mesh.addTriangle(iA, iB, iD);
     mesh.addTriangle(iB, iC, iD);

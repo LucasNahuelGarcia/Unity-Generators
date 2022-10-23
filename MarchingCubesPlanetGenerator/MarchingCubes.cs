@@ -78,11 +78,11 @@ public class MarchingCubes
 
             Vector3 normal = calcularNormalTiangulo(a, b, c);
 
-            int ia = mesh.addVertice(a);
+            int ia = mesh.AddVertice(a);
             mesh.Normals.Add(normal);
-            int ib = mesh.addVertice(b);
+            int ib = mesh.AddVertice(b);
             mesh.Normals.Add(normal);
-            int ic = mesh.addVertice(c);
+            int ic = mesh.AddVertice(c);
             mesh.Normals.Add(normal);
 
             mesh.addTriangle(ia, ib, ic);

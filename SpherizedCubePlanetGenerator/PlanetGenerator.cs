@@ -83,7 +83,7 @@ public class PlanetGenerator : MonoBehaviour, Generator
     {
         foreach (Terrain terr in caras)
         {
-            terr.constructMesh().CrearMesh();
+            terr.constructMesh().CreateMesh();
         }
 
         colourGenerator.updateElevation(shapeGenerator.elevationMinMax);

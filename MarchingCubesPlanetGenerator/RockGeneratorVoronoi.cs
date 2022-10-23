@@ -41,7 +41,7 @@ public class RockGeneratorVoronoi : MonoBehaviour, Generator
 
         marching.ProcesarArea(inicioArea, finArea);
 
-        Mesh meshResultado = meshBuilder.CrearMesh();
+        Mesh meshResultado = meshBuilder.CreateMesh();
         _meshFilter.sharedMesh = meshResultado;
         _meshCollider.sharedMesh = meshResultado;
     }
