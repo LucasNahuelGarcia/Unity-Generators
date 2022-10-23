@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-namespace Generador.MapGenerator
+namespace Generador.LandGenerator
 {
     [CustomEditor(typeof(MapGenerator))]
     public class MapGeneratorEditor : Editor

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Generador.MapGenerator
+namespace Generador.LandGenerator
 {
     public class MapGenerator : MonoBehaviour
     {
@@ -30,14 +30,6 @@ namespace Generador.MapGenerator
         public AnimationCurve curveHeightMultiplier;
         public Bioma[] biomas;
         public bool flatShading = false;
-        private struct Land
-        {
-            public GameObject gameObject;
-            public MeshCollider meshCollider;
-            public MeshFilter meshFilter;
-            public MeshRenderer meshRenderer;
-            public Renderer textureRenderer;
-        }
         private Land land;
 
         public void Generate()
