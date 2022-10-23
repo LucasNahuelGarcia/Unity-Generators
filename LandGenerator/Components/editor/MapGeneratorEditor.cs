@@ -3,18 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-[CustomEditor(typeof(MapGenerator))]
-public class MapGeneratorEditor : Editor
+namespace Generador.MapGenerator
 {
-  public override void OnInspectorGUI()
-  {
-    MapGenerator mapGen = (MapGenerator)target;
+    [CustomEditor(typeof(MapGenerator))]
+    public class MapGeneratorEditor : Editor
+    {
+        public override void OnInspectorGUI()
+        {
+            MapGenerator mapGen = (MapGenerator)target;
 
-    if (DrawDefaultInspector())
-      if (mapGen.autoUpdate)
-        mapGen.Generate();
-    if (GUILayout.Button("Generar"))
-      mapGen.Generate();
+            if (DrawDefaultInspector())
+                if (mapGen.autoUpdate)
+                    mapGen.Generate();
+            if (GUILayout.Button("Generar"))
+                mapGen.Generate();
 
-  }
+        }
+    }
 }
