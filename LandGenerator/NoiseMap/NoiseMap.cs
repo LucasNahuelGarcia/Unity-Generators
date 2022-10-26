@@ -9,5 +9,6 @@ namespace Generador.LandGenerator
         void configNoiseMap(NoiseMapConfig config);
         float[,] GenerateNoiseMap(List<PerlinOctave> octaves);
 
+
     }
 }

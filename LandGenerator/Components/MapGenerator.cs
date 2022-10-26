@@ -6,11 +6,6 @@ namespace Generador.LandGenerator
 {
     public class MapGenerator : MonoBehaviour, Generator
     {
-        void Start()
-        {
-            Generar();
-        }
-
         public Material baseMaterial;
         public noiseMap noiseMapGenerator;
         public bool autoUpdate = true;
@@ -24,9 +19,12 @@ namespace Generador.LandGenerator
         public PerlinOctave[] Octaves;
         public bool offsetIsPosition = true;
         public Vector2 offset;
+        [NonReorderable]
         public Bioma[] biomas;
         public bool flatShading = false;
         private Land land;
+        [SerializeField]
+        private ComputeShader perlinShader;
 
         public void Generar()
         {
@@ -79,10 +77,11 @@ namespace Generador.LandGenerator
             Color[] biomaMap = calcularColourMapDeBiomas(map);
             Mesh meshTerreno = generateTerrainMesh(map).CreateMesh();
             Texture2D texture = TextureGenerator.textureFromColourMap(biomaMap, VerticesPerLine, VerticesPerLine);
+            Material mat = new Material(baseMaterial);
 
             land.meshFilter.sharedMesh = meshTerreno;
             land.meshCollider.sharedMesh = meshTerreno;
-            land.meshRenderer.sharedMaterial = baseMaterial;
+            land.meshRenderer.sharedMaterial = mat;
             land.meshRenderer.sharedMaterial.mainTexture = texture;
         }
 
@@ -142,25 +141,44 @@ namespace Generador.LandGenerator
             return meshData;
         }
 
+        struct vertex
+        {
+            public float x;
+            public float y;
+            public float z;
+        }
         private void addVertices(MeshBuilder meshData, float[,] heightMap)
         {
-            Vector3 initialPosition = transform.position - (new Vector3(ChunkSize / 2, 0, ChunkSize / 2));
-
+            Vector3 initialPosition = transform.localPosition - (new Vector3(ChunkSize / 2, 0, ChunkSize / 2));
             float vertexDistance = ChunkSize / (float)(VerticesPerLine - 1);
+            ComputeBuffer o_VertexBuffer = new ComputeBuffer(VerticesPerLine * VerticesPerLine, sizeof(float) * 3, ComputeBufferType.Default);
 
-            for (int z = 0; z < VerticesPerLine; z++)
-                for (int x = 0; x < VerticesPerLine; x++)
-                {
-                    float vertex_X = initialPosition.x + (x * vertexDistance);
-                    float vertex_Z = initialPosition.z + (z * vertexDistance);
-                    float vertexHeight = curveHeightMultiplier.Evaluate(heightMap[x, z]) * generalHeightMultiplier;
+            perlinShader.SetInt("vertexPerLine", VerticesPerLine);
+            perlinShader.SetFloat("vertexDistance", vertexDistance);
+            perlinShader.SetFloat("generalMultiplier", generalHeightMultiplier);
+            perlinShader.SetFloats("initialPosition", new float[] { initialPosition.x, initialPosition.y, initialPosition.z });
+            perlinShader.SetFloats("offset", new float[] { transform.position.x, transform.position.z});
 
-                    Vector3 newVertex = new Vector3(vertex_X, vertexHeight, vertex_Z);
+            int kernel = perlinShader.FindKernel("calculatePerlin");
+            perlinShader.SetBuffer(kernel, "OutVertex", o_VertexBuffer);
 
-                    meshData.UVs.Add(new Vector2(x, z) / VerticesPerLine);
-                    meshData.AddVertice(newVertex);
-                }
-            Debug.Log("Vertex distance = " + vertexDistance);
+            uint xGroupSize = 64;
+
+            perlinShader.GetKernelThreadGroupSizes(kernel, out xGroupSize, out _, out _);
+            int xGroups = Mathf.CeilToInt(VerticesPerLine * VerticesPerLine / (float)xGroupSize);
+            if (xGroups == 0)
+                xGroups = 1;
+            perlinShader.Dispatch(kernel, xGroups, 1, 1);
+            vertex[] ComputeResult = new vertex[o_VertexBuffer.count];
+            o_VertexBuffer.GetData(ComputeResult, 0, 0, o_VertexBuffer.count);
+
+            for (int i = 0; i < ComputeResult.Length; i++)
+            {
+                vertex vertex = ComputeResult[i];
+                //meshData.UVs.Add(new Vector2(x, z) / VerticesPerLine);
+                Vector3 newVertex = new Vector3(vertex.x, vertex.y, vertex.z);
+                meshData.AddVertice(newVertex);
+            }
         }
 
         private void createFaces(MeshBuilder meshData)

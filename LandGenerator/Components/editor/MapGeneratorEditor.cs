@@ -14,9 +14,9 @@ namespace Generador.LandGenerator
 
             if (DrawDefaultInspector())
                 if (mapGen.autoUpdate)
-                    mapGen.Generate();
+                    mapGen.Generar();
             if (GUILayout.Button("Generar"))
-                mapGen.Generate();
+                mapGen.Generar();
 
         }
     }

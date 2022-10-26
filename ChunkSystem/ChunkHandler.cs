@@ -10,8 +10,9 @@ namespace Generador
         private Vector3Int centroArr;
         // El pivot es el objeto alrededor del que se mueven
         // los chunks
+        public bool IncludeYDirection;
         public GameObject Pivot;
-        public GameObject CuboEjemplo;
+        public GameObject GeneratedObject;
         public int chunkRadius = 1;
         public float chunkSize = 5;
         private Vector3 velocidadChunks;
@@ -22,17 +23,23 @@ namespace Generador
         void Start()
         {
             centroArr = new Vector3Int(chunkRadius, chunkRadius, chunkRadius);
-            chunks = new List<Chunk>();
             this.Generar();
         }
 
         [ContextMenu("Generar")]
         private void Generar()
         {
-            for (int x = -chunkRadius; x <= chunkRadius; x++)
-                for (int z = -chunkRadius; z <= chunkRadius; z++)
-                    for (int y = -chunkRadius; y <= chunkRadius; y++)
-                        AgregarChunk(x, y, z);
+            chunks = new List<Chunk>();
+
+            if (IncludeYDirection)
+                for (int x = -chunkRadius; x <= chunkRadius; x++)
+                    for (int z = -chunkRadius; z <= chunkRadius; z++)
+                        for (int y = -chunkRadius; y <= chunkRadius; y++)
+                            AgregarChunk(x, y, z);
+            else
+                for (int x = -chunkRadius; x <= chunkRadius; x++)
+                    for (int z = -chunkRadius; z <= chunkRadius; z++)
+                        AgregarChunk(x, 0, z);
         }
 
         private GameObject AgregarChunk(int x, int y, int z)
@@ -50,7 +57,7 @@ namespace Generador
 
             // Esto hay que cambiarlo
             // El chunk se tiene que hacer cargo de qué va a generar
-            chunk.objetoAGenerar = CuboEjemplo;
+            chunk.objetoAGenerar = GeneratedObject;
             chunk.size = chunkSize;
             Vector3Int chunkIndex = new Vector3Int(x + chunkRadius, y + chunkRadius, z + chunkRadius);
             chunk.ChunkIndex = chunkIndex;
@@ -87,6 +94,7 @@ namespace Generador
                     {
                         chunk.transform.Translate(indiceAlFrente * chunkSize, 0, 0);
                         chunk.ChunkIndex.x = chunkRadius * 2;
+                        chunk.Generar();
                     }
                     else
                         chunk.ChunkIndex.x = chunk.ChunkIndex.x - 1;
@@ -100,6 +108,8 @@ namespace Generador
                     {
                         chunk.transform.Translate(-indiceAlFrente * chunkSize, 0, 0);
                         chunk.ChunkIndex.x = 0;
+                        chunk.Generar();
+
                     }
                     else
                         chunk.ChunkIndex.x = chunk.ChunkIndex.x + 1;
@@ -112,6 +122,8 @@ namespace Generador
                     if (chunk.ChunkIndex.y == 0)
                     {
                         chunk.transform.Translate(0, indiceAlFrente * chunkSize, 0);
+                        chunk.Generar();
+
                         chunk.ChunkIndex.y = chunkRadius * 2;
                     }
                     else
@@ -125,6 +137,8 @@ namespace Generador
                     if (chunk.ChunkIndex.y == chunkRadius * 2)
                     {
                         chunk.transform.Translate(0, -indiceAlFrente * chunkSize, 0);
+                        chunk.Generar();
+
                         chunk.ChunkIndex.y = 0;
                     }
                     else
@@ -138,6 +152,8 @@ namespace Generador
                     if (chunk.ChunkIndex.z == 0)
                     {
                         chunk.transform.Translate(0, 0, indiceAlFrente * chunkSize);
+                        chunk.Generar();
+
                         chunk.ChunkIndex.z = chunkRadius * 2;
                     }
                     else
@@ -151,6 +167,8 @@ namespace Generador
                     if (chunk.ChunkIndex.z == chunkRadius * 2)
                     {
                         chunk.transform.Translate(0, 0, -indiceAlFrente * chunkSize);
+                        chunk.Generar();
+
                         chunk.ChunkIndex.z = 0;
                     }
                     else

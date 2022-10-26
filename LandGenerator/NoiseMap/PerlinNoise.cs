@@ -59,11 +59,10 @@ namespace Generador.LandGenerator
                 float octaveY = (centroY + offset.y + octave.offset.y) / octave.heightMapZoom;
                 float octaveHeightAtPoint = (Mathf.PerlinNoise(octaveX, octaveY) * 2 - 1);
 
-                octaveHeightAtPoint = octave.curveHeightMultiplier.Evaluate(octaveHeightAtPoint);
+                //octaveHeightAtPoint = octave.curveHeightMultiplier.Evaluate(octaveHeightAtPoint);
                 octaveHeightAtPoint *= octave.weight;
 
                 noiseHeight += octaveHeightAtPoint;
-                Debug.Log(octave.weight);
             }
 
             actualizarMaximoYMinimo(noiseHeight);
@@ -72,14 +71,17 @@ namespace Generador.LandGenerator
         }
 
 
-
-
         private void actualizarMaximoYMinimo(float noiseHeight)
         {
             if (noiseHeight > maxNoiseHeight)
                 maxNoiseHeight = noiseHeight;
             else if (noiseHeight < minNoiseHeight)
                 minNoiseHeight = noiseHeight;
+        }
+
+        public static float GetNoiseAtPoint(float x, float z)
+        {
+            return Mathf.PerlinNoise(x, z);
         }
 
         private static void normailizeMap(float[,] map, float min, float max)
