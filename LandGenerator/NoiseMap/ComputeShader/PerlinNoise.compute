@@ -11,7 +11,6 @@ struct vertex
 };
 
 RWStructuredBuffer<vertex> OutVertex;
-RWStructuredBuffer<biom> inBiom;
 
 int biomsCount;
 int vertexPerLine;
