@@ -149,6 +149,18 @@ namespace Generador.LandGenerator
         }
         private void addVertices(MeshBuilder meshData, float[,] heightMap)
         {
+            vertex[] Vertices = calcularVertices();
+            for (int i = 0; i < Vertices.Length; i++)
+            {
+                vertex vertex = Vertices[i];
+                meshData.UVs.Add(new Vector2(vertex.x, vertex.y) / VerticesPerLine);
+                Vector3 newVertex = new Vector3(vertex.x, vertex.y, vertex.z);
+                meshData.AddVertice(newVertex);
+            }
+        }
+
+        private vertex[] calcularVertices()
+        {
             Vector3 initialPosition = transform.localPosition - (new Vector3(ChunkSize / 2, 0, ChunkSize / 2));
             float vertexDistance = ChunkSize / (float)(VerticesPerLine - 1);
             ComputeBuffer o_VertexBuffer = new ComputeBuffer(VerticesPerLine * VerticesPerLine, sizeof(float) * 3, ComputeBufferType.Default);
@@ -157,7 +169,7 @@ namespace Generador.LandGenerator
             perlinShader.SetFloat("vertexDistance", vertexDistance);
             perlinShader.SetFloat("generalMultiplier", generalHeightMultiplier);
             perlinShader.SetFloats("initialPosition", new float[] { initialPosition.x, initialPosition.y, initialPosition.z });
-            perlinShader.SetFloats("offset", new float[] { transform.position.x, transform.position.z});
+            perlinShader.SetFloats("offset", new float[] { transform.position.x, transform.position.z });
 
             int kernel = perlinShader.FindKernel("calculatePerlin");
             perlinShader.SetBuffer(kernel, "OutVertex", o_VertexBuffer);
@@ -169,16 +181,11 @@ namespace Generador.LandGenerator
             if (xGroups == 0)
                 xGroups = 1;
             perlinShader.Dispatch(kernel, xGroups, 1, 1);
-            vertex[] ComputeResult = new vertex[o_VertexBuffer.count];
-            o_VertexBuffer.GetData(ComputeResult, 0, 0, o_VertexBuffer.count);
+            vertex[] Vertices = new vertex[o_VertexBuffer.count];
+            o_VertexBuffer.GetData(Vertices, 0, 0, o_VertexBuffer.count);
 
-            for (int i = 0; i < ComputeResult.Length; i++)
-            {
-                vertex vertex = ComputeResult[i];
-                //meshData.UVs.Add(new Vector2(x, z) / VerticesPerLine);
-                Vector3 newVertex = new Vector3(vertex.x, vertex.y, vertex.z);
-                meshData.AddVertice(newVertex);
-            }
+            o_VertexBuffer.Dispose();
+            return Vertices;
         }
 
         private void createFaces(MeshBuilder meshData)
