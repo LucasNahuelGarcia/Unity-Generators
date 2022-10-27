@@ -13,6 +13,7 @@ namespace Generador.LandGenerator
         [Tooltip("How many vertex along width. VertexResolution*2=TotalVertex")]
         public int VerticesPerLine = 2;
         public int ChunkSize = 241;
+        public float zoom = 1;
         public float generalHeightMultiplier;
         public AnimationCurve curveHeightMultiplier;
         public int seed = 1;
@@ -25,6 +26,7 @@ namespace Generador.LandGenerator
         private Land land;
         [SerializeField]
         private ComputeShader perlinShader;
+        private vertex[] chunk;
 
         public void Generar()
         {
@@ -135,9 +137,6 @@ namespace Generador.LandGenerator
             addVertices(meshData, heightMap);
             createFaces(meshData);
 
-            Debug.Log("Triangulos: " + meshData.Vertices.Count / 3);
-            Debug.Log("Vertices: " + meshData.Vertices.Count);
-
             return meshData;
         }
 
@@ -149,43 +148,15 @@ namespace Generador.LandGenerator
         }
         private void addVertices(MeshBuilder meshData, float[,] heightMap)
         {
-            vertex[] Vertices = calcularVertices();
+            Vector2 topLeftPosition = new Vector2 (-ChunkSize/2, -ChunkSize/2);
+            vertex[] Vertices = calcularChunk();
             for (int i = 0; i < Vertices.Length; i++)
             {
                 vertex vertex = Vertices[i];
-                meshData.UVs.Add(new Vector2(vertex.x, vertex.y) / VerticesPerLine);
+                meshData.UVs.Add((new Vector2(vertex.x, vertex.y) + topLeftPosition) / ChunkSize);
                 Vector3 newVertex = new Vector3(vertex.x, vertex.y, vertex.z);
                 meshData.AddVertice(newVertex);
             }
-        }
-
-        private vertex[] calcularVertices()
-        {
-            Vector3 initialPosition = transform.localPosition - (new Vector3(ChunkSize / 2, 0, ChunkSize / 2));
-            float vertexDistance = ChunkSize / (float)(VerticesPerLine - 1);
-            ComputeBuffer o_VertexBuffer = new ComputeBuffer(VerticesPerLine * VerticesPerLine, sizeof(float) * 3, ComputeBufferType.Default);
-
-            perlinShader.SetInt("vertexPerLine", VerticesPerLine);
-            perlinShader.SetFloat("vertexDistance", vertexDistance);
-            perlinShader.SetFloat("generalMultiplier", generalHeightMultiplier);
-            perlinShader.SetFloats("initialPosition", new float[] { initialPosition.x, initialPosition.y, initialPosition.z });
-            perlinShader.SetFloats("offset", new float[] { transform.position.x, transform.position.z });
-
-            int kernel = perlinShader.FindKernel("calculatePerlin");
-            perlinShader.SetBuffer(kernel, "OutVertex", o_VertexBuffer);
-
-            uint xGroupSize = 64;
-
-            perlinShader.GetKernelThreadGroupSizes(kernel, out xGroupSize, out _, out _);
-            int xGroups = Mathf.CeilToInt(VerticesPerLine * VerticesPerLine / (float)xGroupSize);
-            if (xGroups == 0)
-                xGroups = 1;
-            perlinShader.Dispatch(kernel, xGroups, 1, 1);
-            vertex[] Vertices = new vertex[o_VertexBuffer.count];
-            o_VertexBuffer.GetData(Vertices, 0, 0, o_VertexBuffer.count);
-
-            o_VertexBuffer.Dispose();
-            return Vertices;
         }
 
         private void createFaces(MeshBuilder meshData)
@@ -212,5 +183,40 @@ namespace Generador.LandGenerator
                 meshData.addTriangle(a, c, d);
             }
         }
+
+        private vertex[] calcularChunk()
+        {
+            Vector3 initialPosition = transform.localPosition - (new Vector3(ChunkSize / 2, 0, ChunkSize / 2));
+            float vertexDistance = ChunkSize / (float)(VerticesPerLine - 1);
+            ComputeBuffer o_VertexBuffer = new ComputeBuffer(VerticesPerLine * VerticesPerLine, sizeof(float) * 3, ComputeBufferType.Default);
+
+            perlinShader.SetInt("vertexPerLine", VerticesPerLine);
+            perlinShader.SetFloat("vertexDistance", vertexDistance);
+            perlinShader.SetFloat("generalMultiplier", generalHeightMultiplier);
+            perlinShader.SetFloat("zoom", 1/zoom);
+            perlinShader.SetFloats("initialPosition", new float[] { initialPosition.x, initialPosition.y, initialPosition.z });
+            perlinShader.SetFloats("offset", new float[] { transform.position.x, transform.position.z });
+
+            int kernel = perlinShader.FindKernel("generateTerrain");
+            perlinShader.SetBuffer(kernel, "OutVertex", o_VertexBuffer);
+
+            uint xGroupSize = 64;
+
+            perlinShader.GetKernelThreadGroupSizes(kernel, out xGroupSize, out _, out _);
+            int xGroups = Mathf.CeilToInt(VerticesPerLine * VerticesPerLine / (float)xGroupSize);
+            if (xGroups == 0)
+                xGroups = 1;
+            perlinShader.Dispatch(kernel, xGroups, 1, 1);
+            vertex[] Vertices = new vertex[o_VertexBuffer.count];
+            o_VertexBuffer.GetData(Vertices, 0, 0, o_VertexBuffer.count);
+
+            o_VertexBuffer.Dispose();
+
+            this.chunk = Vertices;
+
+            return Vertices;
+        }
+
+
     }
 }
