@@ -15,17 +15,14 @@ namespace Generador.LandGenerator
         public int ChunkSize = 241;
         public float zoom = 1;
         public float generalHeightMultiplier;
-        public AnimationCurve curveHeightMultiplier;
         public int seed = 1;
         public PerlinOctave[] Octaves;
         public bool offsetIsPosition = true;
         public Vector2 offset;
         [NonReorderable]
-        public Bioma[] biomas;
-        public bool flatShading = false;
         private Land land;
         [SerializeField]
-        private ComputeShader perlinShader;
+        private ComputeShader mapGeneratorShader;
         private vertex[] chunk;
 
         public void Generar()
@@ -146,23 +143,23 @@ namespace Generador.LandGenerator
             float vertexDistance = ChunkSize / (float)(VerticesPerLine - 1);
             ComputeBuffer o_VertexBuffer = new ComputeBuffer(VerticesPerLine * VerticesPerLine, sizeof(float) * 3, ComputeBufferType.Default);
 
-            perlinShader.SetInt("vertexPerLine", VerticesPerLine);
-            perlinShader.SetFloat("vertexDistance", vertexDistance);
-            perlinShader.SetFloat("generalMultiplier", generalHeightMultiplier);
-            perlinShader.SetFloat("zoom", 1/zoom);
-            perlinShader.SetFloats("initialPosition", new float[] { initialPosition.x, initialPosition.y, initialPosition.z });
-            perlinShader.SetFloats("offset", new float[] { transform.position.x, transform.position.z });
+            mapGeneratorShader.SetInt("vertexPerLine", VerticesPerLine);
+            mapGeneratorShader.SetFloat("vertexDistance", vertexDistance);
+            mapGeneratorShader.SetFloat("generalMultiplier", generalHeightMultiplier);
+            mapGeneratorShader.SetFloat("zoom", 1/zoom);
+            mapGeneratorShader.SetFloats("initialPosition", new float[] { initialPosition.x, initialPosition.y, initialPosition.z });
+            mapGeneratorShader.SetFloats("offset", new float[] { transform.position.x, transform.position.z });
 
-            int kernel = perlinShader.FindKernel("generateTerrain");
-            perlinShader.SetBuffer(kernel, "OutVertex", o_VertexBuffer);
+            int kernel = mapGeneratorShader.FindKernel("generateTerrain");
+            mapGeneratorShader.SetBuffer(kernel, "OutVertex", o_VertexBuffer);
 
             uint xGroupSize = 64;
 
-            perlinShader.GetKernelThreadGroupSizes(kernel, out xGroupSize, out _, out _);
+            mapGeneratorShader.GetKernelThreadGroupSizes(kernel, out xGroupSize, out _, out _);
             int xGroups = Mathf.CeilToInt(VerticesPerLine * VerticesPerLine / (float)xGroupSize);
             if (xGroups == 0)
                 xGroups = 1;
-            perlinShader.Dispatch(kernel, xGroups, 1, 1);
+            mapGeneratorShader.Dispatch(kernel, xGroups, 1, 1);
             vertex[] Vertices = new vertex[o_VertexBuffer.count];
             o_VertexBuffer.GetData(Vertices, 0, 0, o_VertexBuffer.count);
 
