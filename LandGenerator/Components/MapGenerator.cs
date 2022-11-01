@@ -7,7 +7,6 @@ namespace Generador.LandGenerator
     public class MapGenerator : MonoBehaviour, Generator
     {
         public Material baseMaterial;
-        public noiseMap noiseMapGenerator;
         public bool autoUpdate = true;
         [Range(2, 70)] //La cantidad de  vertices que hay en el ancho del mapa
         [Tooltip("How many vertex along width. VertexResolution*2=TotalVertex")]
@@ -33,12 +32,8 @@ namespace Generador.LandGenerator
             if (land.gameObject == null)
                 createLand();
 
-            if (noiseMapGenerator == null)
-                noiseMapGenerator = new PerlinNoise();
-
             noiseMapSetUp();
-            float[,] map = noiseMapGenerator.GenerateNoiseMap(configOctaves());
-            GenerateMapMeshAndTexture(map);
+            GenerateMapMeshAndTexture();
         }
 
         private List<PerlinOctave> configOctaves()
@@ -74,50 +69,18 @@ namespace Generador.LandGenerator
             land.gameObject.transform.SetParent(this.transform);
         }
 
-        private void GenerateMapMeshAndTexture(float[,] map)
+        private void GenerateMapMeshAndTexture()
         {
-            Color[] biomaMap = calcularColourMapDeBiomas(map);
-            Mesh meshTerreno = generateTerrainMesh(map).CreateMesh();
-            Texture2D texture = TextureGenerator.textureFromColourMap(biomaMap, VerticesPerLine, VerticesPerLine);
+            Mesh meshTerreno = generateTerrainMesh().CreateMesh();
+            // Texture2D texture = TextureGenerator.textureFromColourMap(biomaMap, VerticesPerLine, VerticesPerLine);
             Material mat = new Material(baseMaterial);
 
             land.meshFilter.sharedMesh = meshTerreno;
             land.meshCollider.sharedMesh = meshTerreno;
             land.meshRenderer.sharedMaterial = mat;
-            land.meshRenderer.sharedMaterial.mainTexture = texture;
+            // land.meshRenderer.sharedMaterial.mainTexture = texture;
         }
 
-        private Color[] calcularColourMapDeBiomas(float[,] map)
-        {
-            Color[] colorMap = new Color[VerticesPerLine * VerticesPerLine];
-
-            for (int y = 0; y < VerticesPerLine; y++)
-                for (int x = 0; x < VerticesPerLine; x++)
-                {
-                    Bioma bioma = encontrarBiomaDeAltura(map[x, y]);
-                    colorMap[y * VerticesPerLine + x] = bioma.color;
-                }
-
-            return colorMap;
-        }
-
-        private Bioma encontrarBiomaDeAltura(float altura)
-        {
-            Bioma minimoBioma = new Bioma();
-            minimoBioma.color = Color.red;
-            float minimaAltura = float.MaxValue;
-
-            foreach (Bioma bioma in biomas)
-            {
-                if (altura <= bioma.altura && bioma.altura < minimaAltura)
-                {
-                    minimoBioma = bioma;
-                    minimaAltura = bioma.altura;
-                }
-            }
-
-            return minimoBioma;
-        }
 
         private void noiseMapSetUp()
         {
@@ -126,15 +89,13 @@ namespace Generador.LandGenerator
             noiseMapConfig.ancho = VerticesPerLine;
             noiseMapConfig.seed = seed;
             noiseMapConfig.offset = offsetIsPosition ? new Vector2(transform.position.x, transform.position.z) : offset;
-
-            noiseMapGenerator.configNoiseMap(noiseMapConfig);
         }
 
-        private MeshBuilder generateTerrainMesh(float[,] heightMap)
+        private MeshBuilder generateTerrainMesh()
         {
             MeshBuilder meshData = new MeshBuilder();
 
-            addVertices(meshData, heightMap);
+            addVertices(meshData);
             createFaces(meshData);
 
             return meshData;
@@ -146,14 +107,14 @@ namespace Generador.LandGenerator
             public float y;
             public float z;
         }
-        private void addVertices(MeshBuilder meshData, float[,] heightMap)
+        private void addVertices(MeshBuilder meshData)
         {
             Vector2 topLeftPosition = new Vector2 (-ChunkSize/2, -ChunkSize/2);
             vertex[] Vertices = calcularChunk();
             for (int i = 0; i < Vertices.Length; i++)
             {
                 vertex vertex = Vertices[i];
-                meshData.UVs.Add((new Vector2(vertex.x, vertex.y) + topLeftPosition) / ChunkSize);
+                meshData.UVs.Add((new Vector2(vertex.x, vertex.z) + topLeftPosition) / ChunkSize);
                 Vector3 newVertex = new Vector3(vertex.x, vertex.y, vertex.z);
                 meshData.AddVertice(newVertex);
             }
