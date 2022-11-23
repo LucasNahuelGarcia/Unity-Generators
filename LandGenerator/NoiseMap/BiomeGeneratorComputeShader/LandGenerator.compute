@@ -5,15 +5,22 @@
 //Out
 RWStructuredBuffer<vertex> OutVertex;
 
-//In
-int biomsCount;
 int vertexPerLine;
 float vertexDistance;
+
+// Detail
 float generalMultiplier;
+float mountainMultiplier;
+float detailMultiplier;
+
+// Coordinates
 float zoom;
 float3 initialPosition;
 float2 offset;
 
+//Form
+float meshFloor;
+float smoothFactor;
 
 [numthreads(64,1,1)]
 void generateTerrain (uint3 id : SV_DispatchThreadID)
@@ -25,8 +32,27 @@ void generateTerrain (uint3 id : SV_DispatchThreadID)
     float vertex_Z = (initialPosition[2] + (id_Z * vertexDistance));
 
     float2 dot = float2((vertex_X + offset[0]) * zoom, (vertex_Z + offset[1]) * zoom);
+    float2 noise_dot = float2(gnoise(dot[0]), gnoise(dot[1]));
 
-    float vertexHeight = snoise(dot) * generalMultiplier;
+    float calc_voronoi = voronoi(dot);
+    float calc_fractVoronoi = voronoi(noise_dot);
+    float invCalc_voronoi = -calc_voronoi + 1; 
+    float calc_snoise = snoise(noise_dot);
+    float calc_fbm = fbm(dot);
+
+    float mountainLayer = calc_snoise * calc_voronoi * mountainMultiplier;
+    float detailLayer = calc_fbm * detailMultiplier;
+    
+    float vertexHeight = mountainLayer + detailLayer;
+
+    if( meshFloor> vertexHeight) {
+        float h = meshFloor - vertexHeight;
+        h /= smoothFactor;
+        vertexHeight += h;
+    }
+
+
+    vertexHeight *= generalMultiplier;
 
     vertex newVertex;
     newVertex.x = vertex_X;

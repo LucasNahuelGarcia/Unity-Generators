@@ -14,7 +14,12 @@ namespace Generador.LandGenerator
         public int VerticesPerLine = 2;
         public int ChunkSize = 241;
         public float zoom = 1;
-        public float generalHeightMultiplier;
+        public float generalHeightMultiplier = 10;
+        public float mountainsHeightMultiplier = 10;
+        public float detailHeightMultiplier = 10;
+        [Range(0f,4f)]
+        public float floor = 0f;
+        public float smoothFactor = 1f;
         public int seed = 1;
         public bool offsetIsPosition = true;
         public Vector2 offset;
@@ -133,6 +138,10 @@ namespace Generador.LandGenerator
             mapGeneratorShader.SetInt("vertexPerLine", VerticesPerLine);
             mapGeneratorShader.SetFloat("vertexDistance", vertexDistance);
             mapGeneratorShader.SetFloat("generalMultiplier", generalHeightMultiplier);
+            mapGeneratorShader.SetFloat("mountainMultiplier", mountainsHeightMultiplier);
+            mapGeneratorShader.SetFloat("meshFloor", floor);
+            mapGeneratorShader.SetFloat("smoothFactor", smoothFactor);
+            mapGeneratorShader.SetFloat("detailMultiplier", detailHeightMultiplier);
             mapGeneratorShader.SetFloat("zoom", 1 / zoom);
             mapGeneratorShader.SetFloats("initialPosition", new float[] { initialPosition.x, initialPosition.y, initialPosition.z });
             mapGeneratorShader.SetFloats("offset", offset);

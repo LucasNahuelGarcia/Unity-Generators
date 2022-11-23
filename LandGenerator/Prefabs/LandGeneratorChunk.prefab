@@ -46,10 +46,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   baseMaterial: {fileID: 2100000, guid: e898922c7a84276ef80f8478d9c72cb2, type: 2}
   autoUpdate: 1
-  VerticesPerLine: 70
+  VerticesPerLine: 100
   ChunkSize: 500
   zoom: 300
-  generalHeightMultiplier: 47.85
+  generalHeightMultiplier: 39.37
+  mountainsHeightMultiplier: 4.02
+  detailHeightMultiplier: 3.54
+  floor: 1.83
+  smoothFactor: 1.2
   seed: 11
   offsetIsPosition: 1
   offset: {x: 0, y: 0}
