@@ -46,8 +46,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   baseMaterial: {fileID: 2100000, guid: e898922c7a84276ef80f8478d9c72cb2, type: 2}
   autoUpdate: 0
-  VerticesPerLine: 10
+  VerticesPerLine: 5
   ChunkSize: 20
+  zoom: 10.3
   generalHeightMultiplier: 1
   curveHeightMultiplier:
     serializedVersion: 2

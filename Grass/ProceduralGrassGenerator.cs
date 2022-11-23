@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GrassGenerator : MonoBehaviour
+public class ProceduralGrassGenerator : MonoBehaviour
 {
 
   public struct Pasto

@@ -92,7 +92,7 @@ namespace Generador
                 {
                     if (chunk.ChunkIndex.x == 0)
                     {
-                        chunk.transform.Translate(indiceAlFrente * chunkSize, 0, 0);
+                        chunk.transform.Translate(trunc(indiceAlFrente * chunkSize), 0, 0);
                         chunk.ChunkIndex.x = chunkRadius * 2;
                         chunk.Generar();
                     }
@@ -106,7 +106,7 @@ namespace Generador
                 {
                     if (chunk.ChunkIndex.x == chunkRadius * 2)
                     {
-                        chunk.transform.Translate(-indiceAlFrente * chunkSize, 0, 0);
+                        chunk.transform.Translate(trunc(-indiceAlFrente * chunkSize), 0, 0);
                         chunk.ChunkIndex.x = 0;
                         chunk.Generar();
 
@@ -121,7 +121,7 @@ namespace Generador
                 {
                     if (chunk.ChunkIndex.y == 0)
                     {
-                        chunk.transform.Translate(0, indiceAlFrente * chunkSize, 0);
+                        chunk.transform.Translate(0, trunc(indiceAlFrente * chunkSize), 0);
                         chunk.Generar();
 
                         chunk.ChunkIndex.y = chunkRadius * 2;
@@ -136,7 +136,7 @@ namespace Generador
                 {
                     if (chunk.ChunkIndex.y == chunkRadius * 2)
                     {
-                        chunk.transform.Translate(0, -indiceAlFrente * chunkSize, 0);
+                        chunk.transform.Translate(0, trunc(-indiceAlFrente * chunkSize), 0);
                         chunk.Generar();
 
                         chunk.ChunkIndex.y = 0;
@@ -151,7 +151,7 @@ namespace Generador
                 {
                     if (chunk.ChunkIndex.z == 0)
                     {
-                        chunk.transform.Translate(0, 0, indiceAlFrente * chunkSize);
+                        chunk.transform.Translate(0, 0, trunc(indiceAlFrente * chunkSize));
                         chunk.Generar();
 
                         chunk.ChunkIndex.z = chunkRadius * 2;
@@ -166,7 +166,7 @@ namespace Generador
                 {
                     if (chunk.ChunkIndex.z == chunkRadius * 2)
                     {
-                        chunk.transform.Translate(0, 0, -indiceAlFrente * chunkSize);
+                        chunk.transform.Translate(0, 0, trunc(-indiceAlFrente * chunkSize));
                         chunk.Generar();
 
                         chunk.ChunkIndex.z = 0;
@@ -175,6 +175,11 @@ namespace Generador
                         chunk.ChunkIndex.z = chunk.ChunkIndex.z + 1;
                 }
             }
+        }
+
+        private float trunc(float val) {
+            int truncVal = (int) val;
+            return truncVal;
         }
 
         [ContextMenu("Limpiar")]

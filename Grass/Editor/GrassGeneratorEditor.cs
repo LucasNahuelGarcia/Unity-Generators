@@ -1,12 +1,12 @@
 using UnityEngine;
 using UnityEditor;
 
-[CustomEditor(typeof(GrassGenerator))]
+[CustomEditor(typeof(ProceduralGrassGenerator))]
 public class GrassGeneratorEditor : Editor
 {
   public override void OnInspectorGUI()
   {
-    GrassGenerator pastoGen = (GrassGenerator)target;
+    ProceduralGrassGenerator pastoGen = (ProceduralGrassGenerator)target;
 
     DrawDefaultInspector();
     if (GUILayout.Button("Generar"))

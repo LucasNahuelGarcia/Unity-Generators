@@ -1,0 +1,37 @@
+#pragma kernel generateTerrain
+#include "Noise.hlsl"
+#include "Vertex.hlsl"
+
+//Out
+RWStructuredBuffer<vertex> OutVertex;
+
+//In
+int biomsCount;
+int vertexPerLine;
+float vertexDistance;
+float generalMultiplier;
+float zoom;
+float3 initialPosition;
+float2 offset;
+
+
+[numthreads(64,1,1)]
+void generateTerrain (uint3 id : SV_DispatchThreadID)
+{
+    int id_X = id.x % vertexPerLine;
+    int id_Z = trunc(id.x / vertexPerLine);
+
+    float vertex_X = (initialPosition[0] + (id_X * vertexDistance));
+    float vertex_Z = (initialPosition[2] + (id_Z * vertexDistance));
+
+    float2 dot = float2((vertex_X + offset[0]) * zoom, (vertex_Z + offset[1]) * zoom);
+
+    float vertexHeight = snoise(dot) * generalMultiplier;
+
+    vertex newVertex;
+    newVertex.x = vertex_X;
+    newVertex.y = vertexHeight;
+    newVertex.z = vertex_Z;
+
+    OutVertex[id.x] = newVertex;
+}

@@ -5,12 +5,12 @@ using UnityEditor;
 
 namespace Generador.LandGenerator
 {
-    [CustomEditor(typeof(MapGenerator))]
+    [CustomEditor(typeof(LandGenerator))]
     public class MapGeneratorEditor : Editor
     {
         public override void OnInspectorGUI()
         {
-            MapGenerator mapGen = (MapGenerator)target;
+            LandGenerator mapGen = (LandGenerator)target;
 
             if (DrawDefaultInspector())
                 if (mapGen.autoUpdate)
