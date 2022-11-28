@@ -22,6 +22,7 @@ namespace Generador.LandGenerator
         [SerializeField]
         private ComputeShader compute;
         private List<InstanceData> perInstanceData;
+        private Bounds bounds;
 
         static readonly int perInstanceDataID = Shader.PropertyToID("_PerInstanceData");
 
@@ -37,12 +38,6 @@ namespace Generador.LandGenerator
             }
         }
 
-        // private void OnDisable()
-        // {
-        //     perInstanceBuffer.Dispose();
-        //     perInstanceBuffer = null;
-        // }
-
         private void updateFunctionOnGPU()
         {
             compute.SetBuffer(0, perInstanceDataID, perInstanceBuffer);
@@ -53,6 +48,8 @@ namespace Generador.LandGenerator
         [ContextMenu("Generate")]
         public void Decorate(Mesh mesh)
         {
+
+            bounds = new Bounds(transform.position, Vector3.one * 100 + Vector3.up * 500);
             landMesh = mesh;
             perInstanceData = new List<InstanceData>();
 
@@ -109,8 +106,7 @@ namespace Generador.LandGenerator
 
         private void renderBatches(Mesh GrassMesh, Material GrassMaterial)
         {
-            var bounds = new Bounds(this.transform.position, Vector3.one * 500);
-            Graphics.DrawMeshInstancedProcedural(GrassMeshLOD0, submeshIndex, GrassMaterialLOD0, bounds, perInstanceData.Count);
+            Graphics.DrawMeshInstancedProcedural(GrassMeshLOD0, submeshIndex, GrassMaterialLOD0, bounds, perInstanceData.Count, new MaterialPropertyBlock());
         }
     }
 }

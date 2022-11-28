@@ -73,10 +73,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   reciveShadows: 0
   shadowCastingMode: 0
-  GrassMeshLOD0: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
-  GrassMaterialLOD0: {fileID: 2100000, guid: 105d1e02b6f2ad97fa288210a138f60b, type: 2}
-  GrassMeshLOD1: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
-  GrassMaterialLOD1: {fileID: 2100000, guid: 105d1e02b6f2ad97fa288210a138f60b, type: 2}
+  GrassMeshLOD0: {fileID: -8241061421864232401, guid: f477df87731ee03bfb129ca8748a771d,
+    type: 3}
+  GrassMaterialLOD0: {fileID: 2100000, guid: e3bc3147b91f097fbbef28f979bb3065, type: 2}
+  GrassMeshLOD1: {fileID: -8241061421864232401, guid: f477df87731ee03bfb129ca8748a771d,
+    type: 3}
+  GrassMaterialLOD1: {fileID: 2100000, guid: e3bc3147b91f097fbbef28f979bb3065, type: 2}
   InstancesPerMeter: 0.5
   maxHeightToInstantiate: 85
   maxGrassHeight: 0.9
