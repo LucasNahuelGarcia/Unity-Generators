@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 
 namespace Generador.LandGenerator
@@ -45,6 +46,30 @@ namespace Generador.LandGenerator
             landMesh = mesh;
             instancingBatches = new GPUInstancingBatches();
 
+            StartCoroutine(decorateAsync(mesh));
+            // Vector3[] vertices = landMesh.vertices;
+
+            // float vertexDistance = Vector3.Distance(vertices[0], vertices[1]);
+            // float usableDistance = vertexDistance / 2;
+            // int instancesPerLine = (int)(InstancesPerMeter * usableDistance);
+            // float instanceGap = usableDistance / InstancesPerMeter;
+
+
+            // foreach (Vector3 vertex in vertices)
+            // {
+            //     if (vertex.y < maxHeightToInstantiate)
+            //     {
+            //         addGrassMatrix(vertex);
+
+            //         Vector3 initialPosition = vertex - new Vector3(usableDistance, 0, usableDistance);
+            //         for (int x = 0; x < instancesPerLine; x++)
+            //             for (int z = 0; z < instancesPerLine; z++)
+            //                 addGrassMatrix(initialPosition + new Vector3(x * instanceGap, 0, z * instanceGap));
+            //     }
+            // }
+        }
+        IEnumerator decorateAsync(Mesh mesh)
+        {
             Vector3[] vertices = landMesh.vertices;
 
             float vertexDistance = Vector3.Distance(vertices[0], vertices[1]);
@@ -52,9 +77,12 @@ namespace Generador.LandGenerator
             int instancesPerLine = (int)(InstancesPerMeter * usableDistance);
             float instanceGap = usableDistance / InstancesPerMeter;
 
+            int yieldCounter = 0;
+            int yieldTreshold = 700;
 
             foreach (Vector3 vertex in vertices)
             {
+                yieldCounter++;
                 if (vertex.y < maxHeightToInstantiate)
                 {
                     addGrassMatrix(vertex);
@@ -63,6 +91,11 @@ namespace Generador.LandGenerator
                     for (int x = 0; x < instancesPerLine; x++)
                         for (int z = 0; z < instancesPerLine; z++)
                             addGrassMatrix(initialPosition + new Vector3(x * instanceGap, 0, z * instanceGap));
+                }
+                if (yieldCounter >= yieldTreshold)
+                {
+                    yieldCounter = 0;
+                    yield return null;
                 }
             }
         }
@@ -95,7 +128,7 @@ namespace Generador.LandGenerator
         private void renderBatches(Mesh GrassMesh, Material GrassMaterial)
         {
             foreach (List<Matrix4x4> batch in instancingBatches.Batches)
-                Graphics.DrawMeshInstanced(GrassMeshLOD0, 0, GrassMaterialLOD0, batch);
+                Graphics.DrawMeshInstanced(GrassMesh, 0, GrassMaterial, batch);
         }
     }
 }

@@ -71,12 +71,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81a8bb16c6e1abcb09129dffdfc8b340, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  reciveShadows: 0
-  shadowCastingMode: 0
+  GrassLODDistance: 125
+  MaxGrassDistance: 200
   GrassMeshLOD0: {fileID: -8241061421864232401, guid: f43656847d24212188bb2f7d61aba7e0,
     type: 3}
   GrassMaterialLOD0: {fileID: 2100000, guid: 8f2bf6a9d5761a309951826db7ca059d, type: 2}
-  GrassMeshLOD1: {fileID: -8241061421864232401, guid: f43656847d24212188bb2f7d61aba7e0,
+  GrassMeshLOD1: {fileID: -8724548014391836481, guid: f43656847d24212188bb2f7d61aba7e0,
     type: 3}
   GrassMaterialLOD1: {fileID: 2100000, guid: 8f2bf6a9d5761a309951826db7ca059d, type: 2}
   InstancesPerMeter: 1.5
