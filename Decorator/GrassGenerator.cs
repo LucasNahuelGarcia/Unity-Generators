@@ -6,13 +6,17 @@ namespace Generador.LandGenerator
 
     public class GrassGenerator : MonoBehaviour, Decorator
     {
-        private const int submeshIndex = 0;
-        public bool reciveShadows = false;
-        public UnityEngine.Rendering.ShadowCastingMode shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        public float GrassLODDistance = 130f;
+        public float MaxGrassDistance = 230f;
+        [Space()]
         public Mesh GrassMeshLOD0;
         public Material GrassMaterialLOD0;
+
+        [Space()]
         public Mesh GrassMeshLOD1;
         public Material GrassMaterialLOD1;
+
+        [Space()]
         public float InstancesPerMeter = 1;
         public float maxHeightToInstantiate = 5f;
         public float maxGrassHeight = .2f;
@@ -20,6 +24,7 @@ namespace Generador.LandGenerator
         private Mesh landMesh;
         [SerializeField]
         private GPUInstancingBatches instancingBatches;
+        private const int submeshIndex = 0;
 
 
         private struct InstanceData
@@ -70,7 +75,7 @@ namespace Generador.LandGenerator
             float randR = Random.Range(0, 180f);
 
             Vector3 finalPosition = transform.position + new Vector3(point.x + randX, point.y + .5f, point.z + randZ);
-            if (Physics.Raycast(finalPosition, Vector3.down, out RaycastHit raycasthit))
+            if (Physics.Raycast(finalPosition + Vector3.up, Vector3.down, out RaycastHit raycasthit))
                 finalPosition = raycasthit.point;
             Quaternion rotation = Quaternion.identity * Quaternion.Euler(0, randR, 0);
             Vector3 scale = new Vector3(grassScale, 0.02f + randH, grassScale);
@@ -80,8 +85,11 @@ namespace Generador.LandGenerator
 
         void Update()
         {
-            if (Vector3.Distance(Camera.main.transform.position, this.transform.position) <= 500)
+            float distanceToCamera = Vector3.Distance(Camera.main.transform.position, this.transform.position);
+            if (distanceToCamera <= GrassLODDistance)
                 renderBatches(GrassMeshLOD0, GrassMaterialLOD0);
+            else if (distanceToCamera <= MaxGrassDistance)
+                renderBatches(GrassMeshLOD1, GrassMaterialLOD1);
         }
 
         private void renderBatches(Mesh GrassMesh, Material GrassMaterial)
