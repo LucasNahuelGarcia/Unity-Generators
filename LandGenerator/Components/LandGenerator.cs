@@ -17,26 +17,34 @@ namespace Generador.LandGenerator
         public float generalHeightMultiplier = 10;
         public float mountainsHeightMultiplier = 10;
         public float detailHeightMultiplier = 10;
-        [Range(0f,4f)]
+        [Range(0f, 4f)]
         public float floor = 0f;
         public float smoothFactor = 1f;
         public int seed = 1;
         public bool offsetIsPosition = true;
         public Vector2 offset;
-        private Land land;
+        Land land;
         [SerializeField]
         private ComputeShader mapGeneratorShader;
-        private vertex[] chunk;
+        private position[] chunkVertices;
         private Decorator[] decorators;
+
+        private void Start()
+        {
+            this.Generar();
+        }
 
         public void Generar()
         {
             decorators = GetComponents<Decorator>();
+            Debug.Log("Decorators encontrados: " + decorators.Length);
             if (land.gameObject == null)
                 createLand();
 
             noiseMapSetUp();
             GenerateMapMeshAndTexture();
+
+            addDecorations();
         }
 
         public void SetCalidadMesh(int calidad)
@@ -89,10 +97,10 @@ namespace Generador.LandGenerator
         private void addVertices(MeshBuilder meshData)
         {
             Vector2 topLeftPosition = new Vector2(-ChunkSize / 2, -ChunkSize / 2);
-            vertex[] Vertices = calcularChunk();
+            position[] Vertices = calcularChunk();
             for (int i = 0; i < Vertices.Length; i++)
             {
-                vertex vertex = Vertices[i];
+                position vertex = Vertices[i];
                 meshData.UVs.Add((new Vector2(vertex.x, vertex.z) + topLeftPosition) / ChunkSize);
                 Vector3 newVertex = new Vector3(vertex.x, vertex.y, vertex.z);
                 meshData.AddVertice(newVertex);
@@ -124,12 +132,13 @@ namespace Generador.LandGenerator
             }
         }
 
-        private vertex[] calcularChunk()
+        private position[] calcularChunk()
         {
-            Vector3 initialPosition =  - (new Vector3(ChunkSize / 2, 0, ChunkSize / 2));
+            Vector3 initialPosition = -(new Vector3(ChunkSize / 2, 0, ChunkSize / 2));
             float vertexDistance = ChunkSize / (float)(VerticesPerLine - 1);
             float[] offset = { this.offset.x, this.offset.y };
-            if(offsetIsPosition) {
+            if (offsetIsPosition)
+            {
                 offset[0] = transform.position.x;
                 offset[1] = transform.position.z;
             }
@@ -156,29 +165,24 @@ namespace Generador.LandGenerator
             if (xGroups == 0)
                 xGroups = 1;
             mapGeneratorShader.Dispatch(kernel, xGroups, 1, 1);
-            vertex[] Vertices = new vertex[o_VertexBuffer.count];
+            position[] Vertices = new position[o_VertexBuffer.count];
             o_VertexBuffer.GetData(Vertices, 0, 0, o_VertexBuffer.count);
 
-            if (decorators.Length > 0)
-                passDataToDecorators(o_VertexBuffer);
-            else
-                o_VertexBuffer.Dispose();
 
-            this.chunk = Vertices;
+            o_VertexBuffer.Dispose();
+
+
+            this.chunkVertices = Vertices;
 
             return Vertices;
         }
 
-        private void passDataToDecorators(ComputeBuffer vertexBuffer)
+        private void addDecorations()
         {
             foreach (Decorator decorator in decorators)
             {
-                decorator.Decorate(vertexBuffer);
+                decorator.Decorate(land.meshFilter.mesh);
             }
         }
     }
-
-    // private void OnDestroy() {
-
-    // }
 }

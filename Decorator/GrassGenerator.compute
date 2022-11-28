@@ -1,0 +1,13 @@
+#pragma kernel CalculateGrassPosition
+
+	struct InstanceData {
+		float4x4 worldMatrix;
+		float4x4 worldMatrixInverse;
+	};
+	StructuredBuffer<InstanceData> _PerInstanceData;
+// RWStructuredBuffer<float3> _Positions;
+
+[numthreads(64, 1, 1)]
+void CalculateGrassPosition (uint3 id: SV_DispatchThreadID) {
+    // _PerInstanceData[id.x] = float4(0,2,0);
+}

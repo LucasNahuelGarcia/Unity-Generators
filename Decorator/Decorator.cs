@@ -5,6 +5,6 @@ namespace Generador.LandGenerator
 {
     public interface Decorator
     {
-        void Decorate(ComputeBuffer buffer);
+        void Decorate(Mesh mesh);
     }
 }

@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5616275688466909474}
   - component: {fileID: 2736471574250165748}
+  - component: {fileID: 7653339753709635291}
   m_Layer: 0
   m_Name: LandGeneratorChunk
   m_TagString: Untagged
@@ -58,3 +59,26 @@ MonoBehaviour:
   offsetIsPosition: 1
   offset: {x: 0, y: 0}
   mapGeneratorShader: {fileID: 7200000, guid: e6821789865c7b0568a2a6e1b31c77af, type: 3}
+--- !u!114 &7653339753709635291
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 755088288867520718}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81a8bb16c6e1abcb09129dffdfc8b340, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  reciveShadows: 0
+  shadowCastingMode: 0
+  GrassMeshLOD0: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  GrassMaterialLOD0: {fileID: 2100000, guid: 105d1e02b6f2ad97fa288210a138f60b, type: 2}
+  GrassMeshLOD1: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  GrassMaterialLOD1: {fileID: 2100000, guid: 105d1e02b6f2ad97fa288210a138f60b, type: 2}
+  InstancesPerMeter: 0.5
+  maxHeightToInstantiate: 85
+  maxGrassHeight: 0.9
+  grassScale: 1
+  compute: {fileID: 7200000, guid: 78f4d7a4546fa4df99598e1845d632eb, type: 3}

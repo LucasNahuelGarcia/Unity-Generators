@@ -1,7 +1,7 @@
 
 namespace Generador
 {
-    struct vertex
+    struct position
     {
         public float x;
         public float y;
