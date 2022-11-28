@@ -5,6 +5,7 @@ namespace Generador
 {
     public class GPUInstancingBatches
     {
+        public Vector3 BatchCenter;
         public List<List<Matrix4x4>> Batches
         {
             get

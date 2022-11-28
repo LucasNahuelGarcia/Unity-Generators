@@ -66,7 +66,8 @@ namespace Generador
             chunk.Generar();
 
             trigger.isTrigger = true;
-            trigger.size = new Vector3(chunkSize, chunkSize, chunkSize);
+            trigger.size = new Vector3(chunkSize, chunkSize * 5, chunkSize);
+
 
             return generado;
         }

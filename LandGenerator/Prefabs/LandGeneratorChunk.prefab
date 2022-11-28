@@ -46,9 +46,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseMaterial: {fileID: 2100000, guid: e898922c7a84276ef80f8478d9c72cb2, type: 2}
-  autoUpdate: 1
+  autoUpdate: 0
   VerticesPerLine: 100
-  ChunkSize: 500
+  ChunkSize: 100
   zoom: 300
   generalHeightMultiplier: 39.37
   mountainsHeightMultiplier: 4.02
@@ -73,12 +73,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   reciveShadows: 0
   shadowCastingMode: 0
-  GrassMeshLOD0: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
-  GrassMaterialLOD0: {fileID: 2100000, guid: 105d1e02b6f2ad97fa288210a138f60b, type: 2}
-  GrassMeshLOD1: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
-  GrassMaterialLOD1: {fileID: 2100000, guid: 105d1e02b6f2ad97fa288210a138f60b, type: 2}
-  InstancesPerMeter: 0.5
+  GrassMeshLOD0: {fileID: -8241061421864232401, guid: f43656847d24212188bb2f7d61aba7e0,
+    type: 3}
+  GrassMaterialLOD0: {fileID: 2100000, guid: 8f2bf6a9d5761a309951826db7ca059d, type: 2}
+  GrassMeshLOD1: {fileID: -8241061421864232401, guid: f43656847d24212188bb2f7d61aba7e0,
+    type: 3}
+  GrassMaterialLOD1: {fileID: 2100000, guid: 8f2bf6a9d5761a309951826db7ca059d, type: 2}
+  InstancesPerMeter: 1.5
   maxHeightToInstantiate: 85
-  maxGrassHeight: 0.9
+  maxGrassHeight: 0.5
   grassScale: 1
-  compute: {fileID: 7200000, guid: 78f4d7a4546fa4df99598e1845d632eb, type: 3}

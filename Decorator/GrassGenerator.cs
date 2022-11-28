@@ -18,12 +18,9 @@ namespace Generador.LandGenerator
         public float maxGrassHeight = .2f;
         public float grassScale = 1f;
         private Mesh landMesh;
-        private ComputeBuffer perInstanceBuffer;
         [SerializeField]
-        private ComputeShader compute;
-        private List<InstanceData> perInstanceData;
+        private GPUInstancingBatches instancingBatches;
 
-        static readonly int perInstanceDataID = Shader.PropertyToID("_PerInstanceData");
 
         private struct InstanceData
         {
@@ -37,24 +34,11 @@ namespace Generador.LandGenerator
             }
         }
 
-        // private void OnDisable()
-        // {
-        //     perInstanceBuffer.Dispose();
-        //     perInstanceBuffer = null;
-        // }
-
-        private void updateFunctionOnGPU()
-        {
-            compute.SetBuffer(0, perInstanceDataID, perInstanceBuffer);
-            compute.Dispatch(0, perInstanceData.Count, 1, 1);
-            GrassMaterialLOD0.SetBuffer(perInstanceDataID, perInstanceBuffer);
-        }
-
         [ContextMenu("Generate")]
         public void Decorate(Mesh mesh)
         {
             landMesh = mesh;
-            perInstanceData = new List<InstanceData>();
+            instancingBatches = new GPUInstancingBatches();
 
             Vector3[] vertices = landMesh.vertices;
 
@@ -76,13 +60,6 @@ namespace Generador.LandGenerator
                             addGrassMatrix(initialPosition + new Vector3(x * instanceGap, 0, z * instanceGap));
                 }
             }
-
-            if (perInstanceBuffer != null)
-                perInstanceBuffer.Dispose();
-
-            perInstanceBuffer = new ComputeBuffer(perInstanceData.Count, InstanceData.Size());
-            perInstanceBuffer.SetData(perInstanceData);
-            updateFunctionOnGPU();
         }
 
         private void addGrassMatrix(Vector3 point)
@@ -93,24 +70,24 @@ namespace Generador.LandGenerator
             float randR = Random.Range(0, 180f);
 
             Vector3 finalPosition = transform.position + new Vector3(point.x + randX, point.y + .5f, point.z + randZ);
+            if (Physics.Raycast(finalPosition, Vector3.down, out RaycastHit raycasthit))
+                finalPosition = raycasthit.point;
             Quaternion rotation = Quaternion.identity * Quaternion.Euler(0, randR, 0);
-            Vector3 scale = new Vector3(grassScale, 0.1f + randH, grassScale);
+            Vector3 scale = new Vector3(grassScale, 0.02f + randH, grassScale);
 
-            InstanceData data = new InstanceData();
-            data.Matrix = Matrix4x4.TRS(finalPosition, rotation, scale);
-
-            perInstanceData.Add(data);
+            instancingBatches.AddMatrix(Matrix4x4.TRS(finalPosition, rotation, scale));
         }
 
         void Update()
         {
-            renderBatches(GrassMeshLOD0, GrassMaterialLOD0);
+            if (Vector3.Distance(Camera.main.transform.position, this.transform.position) <= 500)
+                renderBatches(GrassMeshLOD0, GrassMaterialLOD0);
         }
 
         private void renderBatches(Mesh GrassMesh, Material GrassMaterial)
         {
-            var bounds = new Bounds(this.transform.position, Vector3.one * 500);
-            Graphics.DrawMeshInstancedProcedural(GrassMeshLOD0, submeshIndex, GrassMaterialLOD0, bounds, perInstanceData.Count);
+            foreach (List<Matrix4x4> batch in instancingBatches.Batches)
+                Graphics.DrawMeshInstanced(GrassMeshLOD0, 0, GrassMaterialLOD0, batch);
         }
     }
 }
