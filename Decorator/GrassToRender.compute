@@ -1,0 +1,12 @@
+#pragma kernel CalculateGrassToRender
+
+RWStructuredBuffer<float3> _Positions;
+AppendStructuredBuffer<float3> _GrassToRender;
+
+float3 cameraPosition;
+float4 cameraRotation;
+
+[numthreads(64, 1, 1)]
+void CalculateGrassToRender(uint3 id: SV_DispatchThreadID) {
+	_GrassToRender.Append(_Positions[id.x]);
+}

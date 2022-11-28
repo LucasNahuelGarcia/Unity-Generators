@@ -25,19 +25,11 @@ namespace Generador.LandGenerator
         private Mesh landMesh;
         [SerializeField]
         private GPUInstancingBatches instancingBatches;
+        [SerializeField]
         private const int submeshIndex = 0;
 
-
-        private struct InstanceData
+        private void OnEnable()
         {
-            public Matrix4x4 Matrix;
-            public Matrix4x4 MatrixInverse;
-
-            public static int Size()
-            {
-                return sizeof(float) * 4 * 4
-                    + sizeof(float) * 4 * 4;
-            }
         }
 
         [ContextMenu("Generate")]
@@ -47,26 +39,6 @@ namespace Generador.LandGenerator
             instancingBatches = new GPUInstancingBatches();
 
             StartCoroutine(decorateAsync(mesh));
-            // Vector3[] vertices = landMesh.vertices;
-
-            // float vertexDistance = Vector3.Distance(vertices[0], vertices[1]);
-            // float usableDistance = vertexDistance / 2;
-            // int instancesPerLine = (int)(InstancesPerMeter * usableDistance);
-            // float instanceGap = usableDistance / InstancesPerMeter;
-
-
-            // foreach (Vector3 vertex in vertices)
-            // {
-            //     if (vertex.y < maxHeightToInstantiate)
-            //     {
-            //         addGrassMatrix(vertex);
-
-            //         Vector3 initialPosition = vertex - new Vector3(usableDistance, 0, usableDistance);
-            //         for (int x = 0; x < instancesPerLine; x++)
-            //             for (int z = 0; z < instancesPerLine; z++)
-            //                 addGrassMatrix(initialPosition + new Vector3(x * instanceGap, 0, z * instanceGap));
-            //     }
-            // }
         }
         IEnumerator decorateAsync(Mesh mesh)
         {
@@ -108,7 +80,7 @@ namespace Generador.LandGenerator
             float randR = Random.Range(0, 180f);
 
             Vector3 finalPosition = transform.position + new Vector3(point.x + randX, point.y + .5f, point.z + randZ);
-            if (Physics.Raycast(finalPosition + Vector3.up, Vector3.down, out RaycastHit raycasthit))
+            if (Physics.Raycast(finalPosition + Vector3.up, Vector3.down, out RaycastHit raycasthit) && Vector3.Angle(raycasthit.point, Vector3.up) > .2)
                 finalPosition = raycasthit.point;
             Quaternion rotation = Quaternion.identity * Quaternion.Euler(0, randR, 0);
             Vector3 scale = new Vector3(grassScale, 0.02f + randH, grassScale);
