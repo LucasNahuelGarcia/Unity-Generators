@@ -23,10 +23,10 @@ public class RockGeneratorVoronoi : MonoBehaviour, Generator
         _meshRenderer = _meshRenderer ?? GetComponent<MeshRenderer>();
         _meshCollider = _meshCollider ?? GetComponent<MeshCollider>();
 
-        buildMesh();
+        BuildMesh();
     }
 
-    public void buildMesh()
+    private void BuildMesh()
     {
         MarchingCubes marching = new MarchingCubes(
         shapeSettings.densidadCubos,

@@ -7,16 +7,14 @@ using UnityEditor;
 public class PlanetGeneratorEditor : Editor
 {
     Editor shapeEditor;
-    Editor colorEditor;
     public override void OnInspectorGUI()
     {
         PlanetGenerator astGen = (PlanetGenerator)target;
 
-        if (GUILayout.Button("Generar") || DrawDefaultInspector() && astGen.autoUpdate)
+        if (GUILayout.Button("Generar") || (DrawDefaultInspector() && astGen.autoUpdate))
             astGen.Generar();
 
         drawSettingsEditor(astGen.shapeSettings, astGen.onShapeSettingsUpdate, true, ref shapeEditor);
-        drawSettingsEditor(astGen.colorSettings, astGen.onColorSettingsUpdate, true, ref colorEditor);
     }
 
     private void drawSettingsEditor(Object settings, System.Action onSettingsUpdated, bool fold, ref Editor editor)
