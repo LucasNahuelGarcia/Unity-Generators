@@ -47,7 +47,7 @@ Interpolators Vertex(Attributes input)
     return output;
 }
 
-float4 addSelfShadow(float3 positionOS, float3 positionWS, float4 currentColor)
+float4 addSelfShadow(float3 positionWS, float4 currentColor)
 {
     float4 color = currentColor;
     float3 lightDirection = GetMainLight().direction;
@@ -64,15 +64,24 @@ float2 ProjectToSphere(float3 p)
     float2 proj;
     float3 normalizedP = normalize(p);
 
-    proj.x = (dot(normalizedP, float3(0, 0, 1)) + 1) / 2;
-    proj.y = (dot(normalizedP, float3(0, 1, 0)) + 1) / 2;
+    float x = normalizedP.x;
+    float y = normalizedP.z;
+    float z = normalizedP.y;
+    float pi = 3.14159;
+    float lon = atan2(y, x);
+    float lat = atan2(z, sqrt(x * x + y * y));
+    float u = (lon + pi) / (2 * pi);
+    float v = (log(tan(lat / 2 + pi / 4)) + pi) / (2 * pi);
+
+    proj.x = u;
+    proj.y = v;
 
     return proj;
 }
 
 float calculatePoles(float3 position)
 {
-    float color = 0;
+    float color;
     if (abs(position.y) < _PolesRadious)
         color = (position.y * _Coldness) * (position.y * _Coldness);
     else
@@ -111,7 +120,7 @@ float4 Fragment(Interpolators input) : SV_Target
     {
         float3 p = input.positionOS;
         const float distortionAmplitude = .006;
-        const float distortionSize = 45;
+        const float distortionSize = 60;
         float distortion = snoise(ProjectToSphere(p) * distortionSize + _Time.x);
         lightingInput.normalWS = lightingInput.normalWS + float3(1, 1, 1) * distortion * distortionAmplitude;
         float fresnel = 1 - abs(dot(lightingInput.normalWS, lightingInput.viewDirectionWS));
@@ -124,7 +133,7 @@ float4 Fragment(Interpolators input) : SV_Target
 
 
     color = UniversalFragmentPBR(lightingInput, surfaceInput);
-    color = addSelfShadow(input.positionOS, input.positionWS, color);
+    color = addSelfShadow(input.positionWS, color);
 
     return color;
 }
